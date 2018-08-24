@@ -1,0 +1,2 @@
+@load ./dovehawk.bro
+
