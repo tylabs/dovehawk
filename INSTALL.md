@@ -22,6 +22,26 @@ Install bro-pkg: sudo pip install bro-pkg
 
 Setup bro-pkg: bro-pkg autoconfig
 
+bro-pkg install dovehawk
+
+check the install: bro -i en0 dovehawk
+
+edit misp_config.bro to include your MISP API key and MISP URL.
+
+edit broctl local config: /usr/local/share/bro/site/local.bro:
+
+add: @load [FULL PATH]/dovehawk #ie  /usr/local/Cellar/bro/2.5.4/share/bro/site/dovehawk/
+
+check eth interface setting: /usr/local/etc/node.cfg
+
+run: broctl deploy
+
+cronjob add: */5 * * * * /usr/local/bin/broctl cron
+
+restart bro: /usr/local/bin/broctl restart
+
+cronjob to restart bro to reimport signatures: 1 */4 * * * /usr/local/bin/broctl restart
+
 
 ## Monitoring and context
 

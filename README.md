@@ -9,7 +9,8 @@ This module uses the the built-in Bro Intelligence Framework to load and monitor
 Indicators are downloaded automatically every 6 hours.  Indicators should expire after 7 hours if removed from MISP.
 
 
-Indicators are downloaded and read into memory.  Content signatures in signatures.sig are MISP Network Activity->bro items downloaded from MISP.  Bro must be restarted to ingest the content signatures. 
+Indicators are downloaded and read into memory.  Content signatures in signatures.sig are MISP Network Activity->bro items downloaded from MISP.  Bro must be restarted to ingest the content signatures.  To do this automatically we recommend restarting bro using broctl and a restart cron described in included file INSTALL.md
+
 
 ## Screencaps
 
