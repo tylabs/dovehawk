@@ -331,6 +331,11 @@ function load_signatures() {
 	
 	print fmt("Local Directory: %s", @DIR);
 	print fmt("MISP Server: %s", MISP_URL);
+
+	if (MISP_URL == "https://yourmispsite.com/") {
+		print "Please edit misp_config.bro to include your MISP API key and URL";
+		exit(1);
+	}
 	
 	# Need to force update this each time to ensure it's not a static constant or zero
 	dh_meta$dh_last_update = network_time();
