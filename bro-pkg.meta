@@ -1,0 +1,5 @@
+[package]
+script_dir = scripts
+description = MISP+Bro. Dovehawk is a Bro Module to import MISP indicators to the Intel Framework automatically and report sightings directly back to MISP as they happen.
+tags = intel, MISP, sightings, signatures
+version = 1.00.000

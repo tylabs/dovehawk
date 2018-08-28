@@ -9,7 +9,7 @@ This module uses the the built-in Bro Intelligence Framework to load and monitor
 Indicators are downloaded automatically every 6 hours.  Indicators should expire after 7 hours if removed from MISP.
 
 
-Indicators are downloaded and read into memory.  Content signatures in signatures.sig which is not yet automatically downloaded.  MISP does not yet support bro content signatures, this module will be updated for downloading those when available.
+Indicators are downloaded and read into memory.  Content signatures in signatures.sig are MISP Network Activity->bro items downloaded from MISP.  Bro must be restarted to ingest the content signatures. 
 
 ## Screencaps
 
@@ -45,6 +45,8 @@ https://www.bro.org/ Bro IDS
 CanCyber.org for their support in releasing a generic MISP version of their Bro Module as open source.
 
 Developers: Michael Kortekaas (original module), Tyler McLellan @tylabs (MISP combined import and sightings)
+
+The entire MISP team and Alexandre Dulaunoy for adding the bro datatype to MISP.
 
 
 # License

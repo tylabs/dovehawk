@@ -12,7 +12,15 @@ Curl: command line tool for accessing web content, tested with curl 7.54.0.
 
 ## Quick Start
 
-Rename misp_config.bro.default to misp_config.bro. Edit misp_config.bro and add your MISP API key and URLs for the Bro Export and Sightings.
+Edit misp_config.bro and add your MISP API key and your MISP_URL.
+
+## Preferred Setup
+
+Install bro: brew install bro / yum install bro
+
+Install bro-pkg: sudo pip install bro-pkg
+
+Setup bro-pkg: bro-pkg autoconfig
 
 
 ## Monitoring and context
@@ -22,13 +30,13 @@ The bro module outputs hits to the console, logs to file, and could send metadat
 
 ## Usage
 
-If running bro directly, reference the Dovehawk folder:
+If running bro directly, reference the dovehawk folder:
 
-sudo bro -i en1 [FULL PATH]/Dovehawk
+sudo bro -i en1 [FULL PATH]/dovehawk
 
 If running using the broctl interface, edit the local.bro configuration file in /usr/local/bro/share/bro/site and, at the bottom, add the line:
 
-@load [FULL PATH]/Dovehawk
+@load [FULL PATH]/dovehawk
 
 then run the broctl deploy sequence to have the scripts installed.
 
@@ -42,7 +50,7 @@ When running locally (ie running Bro on the same system you are generating traff
 
 Add "Log::default_writer=Log::WRITER_NONE" to the command.
 
-bro -i en0 Dovehawk Log::default_writer=Log::WRITER_NONE
+bro -i en0 dovehawk Log::default_writer=Log::WRITER_NONE
 
 
 ## Maintenance

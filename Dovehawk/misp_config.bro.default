@@ -1,7 +1,0 @@
-module Dovehawk;
-
-export { 
-global APIKEY = "===your misp key Event Actions->Automation==="; 
-global all_export_url = "https://yourmispsite.com/attributes/bro/download/all"; 
-global sightings_url = "https://yourmispsite.com/sightings/add/"; 
-}

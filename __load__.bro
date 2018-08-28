@@ -1,0 +1,2 @@
+@load ./scripts/dovehawk.bro
+

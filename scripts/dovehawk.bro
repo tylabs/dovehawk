@@ -1,11 +1,11 @@
 # Dovehawk Bro Module V 1.00.000  2018 08 23
 
-module Dovehawk;
+module dovehawk;
 
-@load ./misp_config.bro
+@load ../misp_config.bro
 @load ./dovehawk_expire.bro
 
-@load-sigs ./signatures.sig
+@load-sigs ../signatures/signatures.sig
 
 @load frameworks/intel/seen
 @load frameworks/intel/do_notice
@@ -36,7 +36,7 @@ export {
 function request2curl(r: ActiveHTTP::Request, bodyfile: string, headersfile: string): string
 {
 	local cmd = fmt("curl --header \"Authorization: %s\" -s -g -o \"%s\" -D \"%s\" -X \"%s\"",
-			str_shell_escape(Dovehawk::APIKEY),
+			str_shell_escape(dovehawk::APIKEY),
 	                str_shell_escape(bodyfile),
 	                str_shell_escape(headersfile),
 	                str_shell_escape(r$method));
@@ -81,14 +81,58 @@ function strings_request(req: ActiveHTTP::Request): string_vec
 }
 
 
+# SIGNATURE DOWNLOAD FUNCTIONS
+function load_sigs_misp() {
+	local request: ActiveHTTP::Request = [
+		$url = MISP_URL + "attributes/text/download/bro"
+	];
+	local fname = "signatures.sig";
+
+	print "Downloading Signatures...";
+	when ( local lines = strings_request(request) ) {
+		if (|lines| >= 0 ) {
+			print "Updating File " + fname;
+			# Directory variable appends period for some reason
+			# but guard that it may not exist in future.
+			local tmp_fname = @DIR + "/../signatures/." + fname;
+			local final_fname = @DIR + "/../signatures/" + fname;
+			local f = open(tmp_fname);
+			enable_raw_output(f);
+			print f,"# Dovehawk.io Content Signatures - Sig events should have \"MISP:\" prefix\n\n";
+
+			for (line in lines) {
+				print f,gsub(lines[line], /\x0d/, "") + "\n"; #remove extra newlines bro doesn't like
+			}
+			
+			close(f);
+			
+			if (unlink(final_fname)) {
+				if (rename(tmp_fname,final_fname)) {
+					print "    Finished Updating File: " + fname;
+				} else {
+					print "ERROR: Could not rename tmp file for signature update: " + tmp_fname;
+				}
+			} else {
+				print "WARNING: Could not unlink file for signature update: " + final_fname;
+			}
+			print fmt("    Signatures file contains: %d lines", |lines|);
+
+		} else {
+			print "WARNING: Signature update download failed";
+		}
+    }
+
+}
+
+
 # INDICATOR DOWNLOAD FUNCTIONS - Note that
-# line counts for signature downloads includes possible comments - output stored in stdout.log to
+# total line count for signature downloads includes possible comments - output stored in stdout.log to
 # be used for verification checking if necessary.
 
 # Special option to load all the hash strings combined as a single file
 function load_all_misp() {
 	local request: ActiveHTTP::Request = [
-		$url = all_export_url
+		$url = MISP_URL + "attributes/bro/download/all"
 	];
 
     print "Downloading Indicators...";
@@ -162,8 +206,10 @@ function load_all_misp() {
 					} else if (parts[1] == "Intel::FILE_NAME") {
 						item$indicator_type = Intel::FILE_NAME;
 						filenamecnt += 1;
-					} else
+					} else if (parts[1] == "Intel::DOMAIN")
 						domaincnt += 1;
+					else
+						next;
 
 					Intel::insert(item);
 				}
@@ -172,6 +218,7 @@ function load_all_misp() {
 			print " Intel Indicator Counts:";
 			print fmt("    Intel::DOMAIN:    %d", domaincnt);
 			print fmt("    Intel::IP:        %d", ipcnt);
+			print fmt("    Intel::SUBNET:    %d", subnetcnt);
 			print fmt("    Intel::SOFTWARE:  %d", softwarecnt);
 			print fmt("    Intel::EMAIL:     %d", emailcnt);
 			print fmt("    Intel::USER_NAME: %d", usercnt);
@@ -188,16 +235,16 @@ function load_all_misp() {
 
 
 
-
+# SIGHTINGS FUNCTIONS
 function register_hit(hitvalue: string, desc: string) {
-    local url_string = Dovehawk::sightings_url;
+    local url_string = MISP_URL + "sightings/add/";
     local post_data = fmt("{\"value\": \"%s\"}", hitvalue);
 
     local request: ActiveHTTP::Request = [
 	$url=url_string,
 	$method="POST",
 	$client_data=post_data,
-	$addl_curl_args = fmt("--header \"Authorization: %s\" --header \"Content-Type: application/json\" --header \"Accept: application/json\"", str_shell_escape(Dovehawk::APIKEY))
+	$addl_curl_args = fmt("--header \"Authorization: %s\" --header \"Content-Type: application/json\" --header \"Accept: application/json\"", str_shell_escape(dovehawk::APIKEY))
     ];
 	
     when ( local resp = ActiveHTTP::request(request) ) {
@@ -282,7 +329,8 @@ event do_reload_signatures() {
 function load_signatures() {
 	print fmt("Downloading Signatures %s", strftime("%Y/%m/%d %H:%M:%S", network_time()));
 	
-	print fmt("Source Directory: %s", @DIR);
+	print fmt("Local Directory: %s", @DIR);
+	print fmt("MISP Server: %s", MISP_URL);
 	
 	# Need to force update this each time to ensure it's not a static constant or zero
 	dh_meta$dh_last_update = network_time();
@@ -290,8 +338,8 @@ function load_signatures() {
 	# Load all contains all MISP bro output combined
 	load_all_misp();
 
-	#placeholder for downloading/reingesting full content signatures when misp gains support for them
-
+	# Download bro content signatures MISP->Network Activity->bro items
+	load_sigs_misp();
 	
 	# Force output into stdout.log when using broctl
 	flush_all();
