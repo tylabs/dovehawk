@@ -239,6 +239,7 @@ function load_all_misp() {
 function register_hit(hitvalue: string, desc: string) {
     local url_string = MISP_URL + "sightings/add/";
     local post_data = fmt("{\"value\": \"%s\"}", hitvalue);
+    #print post_data;
 
     local request: ActiveHTTP::Request = [
 	$url=url_string,
@@ -250,9 +251,11 @@ function register_hit(hitvalue: string, desc: string) {
     when ( local resp = ActiveHTTP::request(request) ) {
 		
 		if (resp$code == 200) {
-			print fmt("  Sighting Result ===> %s", resp$body);
+			#print "  Sighting added";
+			#print fmt("  Sighting Result ===> %s", resp$body);
 		} else {
-			print fmt("  Sighting FAILED ===> %s", resp);
+			#print "  Sighting failed, item not found.";
+			#print fmt("  Sighting FAILED ===> %s", resp);
 		}
     }
 	
@@ -402,9 +405,11 @@ event signature_match(state: signature_state, msg: string, data: string)
 		hit += "|data:" + data;
 	}
 	
-	register_hit(state$sig_id,hit);
+	register_hit(sig_id, hit);
 
-	print "Content Signature Hit ===> " + state$sig_id;
+	print "Content Signature Hit ===> " + sig_id;
+	print "   Metadata ===> " + hit;
+
 }
 
 
