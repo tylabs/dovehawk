@@ -1,4 +1,4 @@
-# Dovehawk Bro Module V 1.00.000  2018 08 23
+# Dovehawk Bro Module V 1.00.001  2018 08 28 @tylabs
 
 module dovehawk;
 
@@ -13,7 +13,7 @@ module dovehawk;
 redef Intel::item_expiration = 7hr;
 
 export {
-	global DH_VERSION = "1.00.000";
+	global DH_VERSION = "1.00.001";
 
 	global dh_meta : Intel::MetaData = [
 		$source = "MISP",
