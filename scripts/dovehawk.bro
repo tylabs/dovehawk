@@ -252,10 +252,10 @@ function register_hit(hitvalue: string, desc: string) {
 		
 		if (resp$code == 200) {
 			#print "  Sighting added";
-			#print fmt("  Sighting Result ===> %s", resp$body);
+			print fmt("  Sighting Result ===> %s", resp$body);
 		} else {
 			#print "  Sighting failed, item not found.";
-			#print fmt("  Sighting FAILED ===> %s", resp);
+			print fmt("  Sighting FAILED ===> %s", resp);
 		}
     }
 	
@@ -405,7 +405,7 @@ event signature_match(state: signature_state, msg: string, data: string)
 		hit += "|data:" + data;
 	}
 	
-	register_hit(sig_id, hit);
+	register_hit("%" + sig_id + "%", hit); #%wildcards required for search
 
 	print "Content Signature Hit ===> " + sig_id;
 	print "   Metadata ===> " + hit;
