@@ -56,9 +56,9 @@ https://www.bro.org/ Bro IDS
 
 CanCyber.org for their support in releasing a generic MISP version of their Bro Module as open source.
 
-Developers: Michael Kortekaas (original module), Tyler McLellan @tylabs (MISP combined import and sightings)
+Developers: Michael Kortekaas @mrkortek (original module), Tyler McLellan @tylabs (MISP combined import and sightings)
 
-The entire MISP team and Alexandre Dulaunoy for adding the bro datatype to MISP.
+The entire MISP team and Alexandre Dulaunoy @adulau for adding the bro datatype to MISP.
 
 
 # License
