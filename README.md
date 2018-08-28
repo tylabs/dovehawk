@@ -13,11 +13,18 @@ Indicators are downloaded and read into memory.  Content signatures in signature
 
 ## Screencaps
 
+### Dovehawk Downloads Indicators From MISP
+
 ![Dovehawk signature download](https://dovehawk.io/images/dovehawk_launch.png "Dovehawk startup")
+
+### Dovehawk Sighting Uploaded
 
 ![Dovehawk hit and sighting upload](https://dovehawk.io/images/dovehawk_hit.png "Dovehawk hit")
 
+### MISP Sighting
+
 ![MISP sightings](https://dovehawk.io/images/misp_sightings.png "MISP Sightings")
+
 
 ## Official Source
 
