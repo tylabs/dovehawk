@@ -5,6 +5,7 @@ module Dovehawk;
 @load ./misp_config.bro
 @load ./dovehawk_expire.bro
 
+@load-sigs ./signatures.sig
 
 @load frameworks/intel/seen
 @load frameworks/intel/do_notice
@@ -290,7 +291,6 @@ function load_signatures() {
 	load_all_misp();
 
 	#placeholder for downloading/reingesting full content signatures when misp gains support for them
-	@load-sigs ./signatures.sig
 
 	
 	# Force output into stdout.log when using broctl
