@@ -12,7 +12,7 @@ Curl: command line tool for accessing web content, tested with curl 7.54.0.
 
 ## Quick Start
 
-Edit misp_config.bro and add your MISP API key and your MISP_URL.
+Edit misp_config.bro and add your MISP API key, your MISP_URL and optional Slack Web Hook URL.
 
 ## Preferred Setup
 
@@ -26,7 +26,7 @@ bro-pkg install dovehawk
 
 check the install: bro -i en0 dovehawk
 
-edit misp_config.bro to include your MISP API key and MISP URL.
+edit misp_config.bro to include your MISP API key, MISP URL and optional Slack Web Hook.
 
 edit broctl local config: /usr/local/share/bro/site/local.bro:
 

@@ -12,6 +12,8 @@ Indicators are downloaded automatically every 6 hours.  Indicators should expire
 Indicators are downloaded and read into memory.  Content signatures in signatures.sig are MISP Network Activity->bro items downloaded from MISP.  The event text should start with "MISP:".  Bro must be restarted to ingest the content signatures.  To do this automatically we recommend restarting bro using broctl and a restart cron described in included file INSTALL.md
 
 
+Optional Slack.com web hook reporting.
+
 
 ## Screencaps
 
@@ -28,14 +30,20 @@ Indicators are downloaded and read into memory.  Content signatures in signature
 ![MISP sightings](https://dovehawk.io/images/misp_sightings.png "MISP Sightings")
 
 
+### Slack Web Hook
+
+![Slack Web Hook](https://dovehawk.io/images/slack_hit.png "Slack Output")
+
+
 ## Sample Content Signature
 
+```bro
 signature eicar_test_content {
   ip-proto == tcp
   payload /.*X5O\!P%@AP\[4\\PZX54\(P\^\)7CC\)7\}\$EICAR\-STANDARD\-ANTIVIRUS\-TEST\-FILE\!\$H\+H\*/
   event "MISP: eicar test file in TCP plain text"
 }
-
+```
 
 
 ## Official Source

@@ -1,4 +1,4 @@
-# Dovehawk Bro Module V 1.00.001  2018 08 28 @tylabs
+# Dovehawk Bro Module V 1.00.002  2018 08 28 @tylabs
 
 module dovehawk;
 
@@ -13,7 +13,7 @@ module dovehawk;
 redef Intel::item_expiration = 7hr;
 
 export {
-	global DH_VERSION = "1.00.001";
+	global DH_VERSION = "1.00.002";
 
 	global dh_meta : Intel::MetaData = [
 		$source = "MISP",
@@ -97,11 +97,14 @@ function load_sigs_misp() {
 			local tmp_fname = @DIR + "/../signatures/." + fname;
 			local final_fname = @DIR + "/../signatures/" + fname;
 			local f = open(tmp_fname);
+			local cnt = 0;
 			enable_raw_output(f);
 			print f,"# Dovehawk.io Content Signatures - Sig events should have \"MISP:\" prefix\n\n";
 
 			for (line in lines) {
 				print f,gsub(lines[line], /\x0d/, "") + "\n"; #remove extra newlines bro doesn't like
+				if (sub_bytes(lines[line], 0, 10) == "signature ")
+					cnt += 1;
 			}
 			
 			close(f);
@@ -115,7 +118,7 @@ function load_sigs_misp() {
 			} else {
 				print "WARNING: Could not unlink file for signature update: " + final_fname;
 			}
-			print fmt("    Signatures file contains: %d lines", |lines|);
+			print fmt("    Signatures file contains: %d signatures", |cnt|);
 
 		} else {
 			print "WARNING: Signature update download failed";
@@ -261,6 +264,34 @@ function register_hit(hitvalue: string, desc: string) {
 	
 }
 
+
+
+function slack_hit(hitvalue: string, desc: string) {
+    local url_string = SLACK_URL;
+    if (SLACK_URL == "")
+    	return;
+    local post_data = fmt("{\"text\": \"%s\", \"attachments\": \"%s\"}", escape_string(desc), escape_string(desc));
+    #print post_data;
+
+    local request: ActiveHTTP::Request = [
+	$url=url_string,
+	$method="POST",
+	$client_data=post_data,
+	$addl_curl_args = " --header \"Content-Type: application/json\" --header \"Accept: application/json\""
+    ];
+	
+    when ( local resp = ActiveHTTP::request(request) ) {
+		
+		if (resp$code == 200) {
+			#print "  Slack web hook success";
+		} else {
+			#print "  Slack web hook FAILED";
+		}
+    }
+	
+}
+
+
 # Need to check info variables for null since they are all optional
 # Use a | separator since this is not as likely to be part of the data
 # Hit data should be kept below 1000 bytes or it will be rejected
@@ -310,8 +341,10 @@ hook Notice::policy(n: Notice::Info) &priority=3 {
 			hit += "|msg:" + n$msg;
 		}
 		register_hit(n$sub, hit);
+		slack_hit(n$sub, hit);
 		print "Intel Signature Hit ===> " + n$sub;
 		print "   Metadata ===> " + hit;
+
 
 	}
 }
@@ -330,12 +363,14 @@ event do_reload_signatures() {
 
 
 function load_signatures() {
-	print fmt("Downloading Signatures %s", strftime("%Y/%m/%d %H:%M:%S", network_time()));
+
+	print fmt("Downloading Signatures %s [%s]", strftime("%Y/%m/%d %H:%M:%S", network_time()), DH_VERSION);
+	slack_hit("", fmt("%s: Dovehawk: Bro Downloading Signatures %s [%s]", gethostname(), strftime("%Y/%m/%d %H:%M:%S", network_time()), DH_VERSION));
 	
 	print fmt("Local Directory: %s", @DIR);
 	print fmt("MISP Server: %s", MISP_URL);
 
-	if (MISP_URL == "https://yourmispsite.com/") {
+	if (MISP_URL == "https://yourmispsite.com/" || MISP_URL == "") {
 		print "Please edit misp_config.bro to include your MISP API key and URL";
 		exit(1);
 	}
@@ -409,6 +444,7 @@ event signature_match(state: signature_state, msg: string, data: string)
 
 	print "Content Signature Hit ===> " + sig_id;
 	print "   Metadata ===> " + hit;
+	slack_hit(msg, hit);
 
 }
 
