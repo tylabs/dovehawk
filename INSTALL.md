@@ -12,11 +12,28 @@ Bro IDS: tested with version version 2.5.4.
 Curl: command line tool for accessing web content, tested with curl 7.54.0.
 
 
-## Quick Start
+## Quick Start - No install
+
+Download latest release from GitHub
 
 Edit misp_config.bro and add your MISP API key, your MISP_URL and optional Slack Web Hook URL.
 
-## Preferred Setup
+Locally launch bro: bro -i en0 path_to_dovehawk
+
+
+## Quick Start - Install package
+
+bro-pkg install https://github.com/tylabs/dovehawk
+
+Run package to get local directory: bro -i en0 dovehawk
+
+Edit misp_config.bro and add your MISP API key, your MISP_URL and optional Slack Web Hook URL.
+
+Run: bro -i en0 dovehawk
+
+
+
+## Detailed Install
 
 Install bro: brew install bro / yum install bro
 
@@ -24,7 +41,7 @@ Install bro-pkg: sudo pip install bro-pkg
 
 Setup bro-pkg: bro-pkg autoconfig
 
-bro-pkg install dovehawk
+bro-pkg install https://github.com/tylabs/dovehawk
 
 check the install: bro -i en0 dovehawk
 
