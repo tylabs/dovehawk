@@ -5,6 +5,8 @@ Threat Hunting with Bro and MISP
 
 ## Requirements
 
+MISP: Version 2.4.94 includes the Bro datamodel required to handle content signatures.
+
 Bro IDS: tested with version version 2.5.4.
 
 Curl: command line tool for accessing web content, tested with curl 7.54.0.
