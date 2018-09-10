@@ -350,6 +350,49 @@ hook Notice::policy(n: Notice::Info) &priority=3 {
 }
 
 
+function startup_intel() {
+	# WARNING: network_time function seems to return 0 until after Bro is fully initialized
+	local startup_meta : Intel::MetaData = [
+		$source = "MISP",
+		$do_notice = T,
+		$dh_expire = -1 min,
+		$dh_last_update = network_time()
+	];
+	
+	local item : Intel::Item = [
+		$indicator = "",
+		$indicator_type = Intel::DOMAIN,
+		$meta = startup_meta
+	];
+	
+	# IMPORTANT: Need at least one registered otherwise item_expired hook may not be called.
+	# This fake intel item MUST be setup in order for the expiry feature to work properly.
+	# The expiry hook seems to be removed before the load_signatures function is called
+	# unless an item exists.
+	item$indicator = "www.fakedovehawkurl.zzz";
+	Intel::insert(item);
+	
+	# Meta seems to be referenced like a pointer so changes after an insert update
+	# ALL existing items that used it. Since these are usually submitted as a batch
+	# this reuse optimization should not normally be an issue but be aware. The Item
+	# structure seems to be duplicated properly so they are kept unique.
+	local test_meta : Intel::MetaData = [
+		$source = "MISP",
+		$do_notice = T,
+		$dh_expire = -1 min,
+		$dh_last_update = network_time()
+	];
+	
+	item$meta = test_meta;
+		
+	# Add blocks of the following three lines for specific intel tests
+	# Note these will not expire due to the negative value set in the meta
+	#item$indicator = "www.google.com";
+	#item$indicator_type = Intel::DOMAIN;
+	#Intel::insert(item);
+}
+
+
 
 event do_reload_signatures() {
 	if (bro_is_terminating()) {
@@ -451,6 +494,7 @@ event signature_match(state: signature_state, msg: string, data: string)
 
 event bro_init()
 {
+	startup_intel();
 	schedule signature_refresh_period { do_reload_signatures() };
 }
 

@@ -35,7 +35,8 @@ hook extend_match(info: Info, s: Seen, items: set[Item])
 			# Item already expired
 			--matches;
 			print fmt("Removing Expired Intel Item: %s",item$indicator);
-			remove(item, F);
+			flush_all();
+			remove(item, T);
 		}
 	}
 	
@@ -64,7 +65,8 @@ hook Intel::item_expired(indicator: string, indicator_type: Type, metas: set[Met
 			];
 		
 			print fmt("Removing Expired Intel Item: %s",indicator);
-			remove(item, F);
+			flush_all();
+			remove(item, T);
 		}
 	}
 }
