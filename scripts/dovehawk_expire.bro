@@ -9,14 +9,15 @@ module Intel;
 export {
 	## Default expiration interval for single intelligence items
 	## A negative value disables expiration for these items.
-	const dh_per_item_expiration = -1min &redef;
+	const per_item_expiration = -1min &redef;
 
 	redef record MetaData += {
-		dh_expire: interval &default = dh_per_item_expiration;
+		expire: interval &default = per_item_expiration;
 
 		## Internal value tracks time of item creation, last update.
-		dh_last_update: time  &default = network_time();
+		last_update: time  &default = network_time();
 	};
+
 }
 
 hook extend_match(info: Info, s: Seen, items: set[Item])
@@ -25,12 +26,14 @@ hook extend_match(info: Info, s: Seen, items: set[Item])
 	for ( item in items )
 	{
 		local meta = item$meta;
-		
+		#print fmt("extend match: %s",item$indicator);
+		#print meta;
+
 		if (meta$source != "MISP") {
 			next;
 		}
 		
-		if ( meta$dh_expire > 0 sec && meta$dh_last_update + meta$dh_expire < network_time() )
+		if ( meta$expire > 0 sec && meta$last_update + meta$expire < network_time() )
 		{
 			# Item already expired
 			--matches;
@@ -46,8 +49,10 @@ hook extend_match(info: Info, s: Seen, items: set[Item])
 }
 
 
-hook Intel::item_expired(indicator: string, indicator_type: Type, metas: set[MetaData])
+hook item_expired(indicator: string, indicator_type: Type, metas: set[MetaData])
 {
+
+	#print fmt("hook item_expired: %s",indicator);
 	for ( meta in metas )
 	{
 		if (meta$source != "MISP") {
@@ -55,7 +60,7 @@ hook Intel::item_expired(indicator: string, indicator_type: Type, metas: set[Met
 		}
 	
 		# Check for expired items
-		if ( meta$dh_expire > 0 sec && meta$dh_last_update + meta$dh_expire < network_time() )
+		if ( meta$expire > 0 sec && meta$last_update + meta$expire < network_time() )
 		{
 			# Recreate the item from the indicator and meta
 			local item: Intel::Item = [

@@ -10,18 +10,10 @@ module dovehawk;
 @load frameworks/intel/seen
 @load frameworks/intel/do_notice
 
-redef Intel::item_expiration = 7hr;
+redef Intel::item_expiration = 4 hr;
 
 export {
 	global DH_VERSION = "1.00.002";
-
-	global dh_meta : Intel::MetaData = [
-		$source = "MISP",
-		$do_notice = T,
-		$dh_expire = 7hr,
-		$desc = "",
-		$url = ""
-	];
 	
 	global signature_refresh_period = 6hr &redef;
 	global load_signatures: function();
@@ -162,21 +154,21 @@ function load_all_misp() {
 				#local parts: string_array;
 				local parts = split_string(sig, /\t/);
 
+
+
 				if (|parts| > 3) {
+					local dh_meta : Intel::MetaData = [
+						$source = "MISP",
+						$do_notice = T,
+						$expire = 6.5 hr,
+						$desc = parts[3],
+						$url = parts[4]
+					];
 					local item : Intel::Item = [
 						$indicator = parts[0],
 						$indicator_type = Intel::DOMAIN,
 						$meta = dh_meta
 					];
-
-					item$meta$desc = parts[4];
-					item$meta$url = parts[5];
-
-
-					#For debugging print the items
-					##print fmt("   %s=%s", parts[1], parts[0]);
-
-
 
 
 					if (parts[1] == "Intel::ADDR") {
@@ -350,13 +342,18 @@ hook Notice::policy(n: Notice::Info) &priority=3 {
 }
 
 
+
+
 function startup_intel() {
 	# WARNING: network_time function seems to return 0 until after Bro is fully initialized
 	local startup_meta : Intel::MetaData = [
 		$source = "MISP",
 		$do_notice = T,
-		$dh_expire = -1 min,
-		$dh_last_update = network_time()
+		$expire = -1 min,
+		$last_update = network_time(),
+		$url = "",
+		$desc = "local dummy item"
+
 	];
 	
 	local item : Intel::Item = [
@@ -372,24 +369,6 @@ function startup_intel() {
 	item$indicator = "www.fakedovehawkurl.zzz";
 	Intel::insert(item);
 	
-	# Meta seems to be referenced like a pointer so changes after an insert update
-	# ALL existing items that used it. Since these are usually submitted as a batch
-	# this reuse optimization should not normally be an issue but be aware. The Item
-	# structure seems to be duplicated properly so they are kept unique.
-	local test_meta : Intel::MetaData = [
-		$source = "MISP",
-		$do_notice = T,
-		$dh_expire = -1 min,
-		$dh_last_update = network_time()
-	];
-	
-	item$meta = test_meta;
-		
-	# Add blocks of the following three lines for specific intel tests
-	# Note these will not expire due to the negative value set in the meta
-	#item$indicator = "www.google.com";
-	#item$indicator_type = Intel::DOMAIN;
-	#Intel::insert(item);
 }
 
 
@@ -417,10 +396,7 @@ function load_signatures() {
 		print "Please edit misp_config.bro to include your MISP API key and URL";
 		exit(1);
 	}
-	
-	# Need to force update this each time to ensure it's not a static constant or zero
-	dh_meta$dh_last_update = network_time();
-	
+		
 	# Load all contains all MISP bro output combined
 	load_all_misp();
 
