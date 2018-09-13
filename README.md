@@ -58,23 +58,23 @@ Intervals are set in dovehawk.bro.
 
 ### Setting for expired indicator cleanup (should be less then signature_refresh_period)
 
-'''
+```bro
 redef Intel::item_expiration = 4 hr
-'''
+```
 
 
 ### Setting for MISP download interval
 
-'''
+```bro
 global signature_refresh_period = 6hr &redef;
-'''
+```
 
 
 ### Setting for indicator expiration: (should be slightly more than signature_refresh_period)
 
-'''
+```bro
 $expire = 6.5 hr,
-'''
+```
 
 
 ## Official Source
@@ -93,16 +93,16 @@ $expire = 6.5 hr,
 
 # Special Thanks
 
-(CanCyber.org)[https://cancyber.org] for their support in releasing a generic MISP version of their Bro Module as open source.
+[CanCyber.org](https://cancyber.org) for their support in releasing a generic MISP version of their Bro Module as open source.
 
-Developers: Michael Kortekaas (@mrkortek)[https://twitter.com/mrkortek] (original module), Tyler McLellan (@tylabs)[https://twitter.com/tylabs] (MISP combined import and sightings)
+Developers: Michael Kortekaas [@mrkortek](https://twitter.com/mrkortek) (original module), Tyler McLellan [@tylabs](https://twitter.com/tylabs) (MISP combined import and sightings)
 
-The entire MISP team and Alexandre Dulaunoy (@adulau)[https://twitter.com/adulau] for adding the bro datatype to MISP.
+The entire MISP team and Alexandre Dulaunoy [@adulau](https://twitter.com/adulau) for adding the bro datatype to MISP.
 
 
 # License
 
-Copyright 2018 (Cancyber Inc.)[https://cancyber.org/], Michael Kortekaas (@mrkortek)[https://twitter.com/mrkortek], Tyler McLellan (@tylabs)[https://twitter.com/tylabs]
+Copyright &copy; 2018 [Cancyber Inc.](https://cancyber.org/), Michael Kortekaas [@mrkortek](https://twitter.com/mrkortek), Tyler McLellan [@tylabs](https://twitter.com/tylabs)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
