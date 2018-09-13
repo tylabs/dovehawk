@@ -8,7 +8,9 @@ module dovehawk;
 @load-sigs ../signatures/signatures.sig
 
 @load frameworks/intel/seen
+@load base/frameworks/intel
 @load frameworks/intel/do_notice
+
 
 redef Intel::item_expiration = 4 hr;
 
@@ -17,6 +19,11 @@ export {
 	
 	global signature_refresh_period = 6hr &redef;
 	global load_signatures: function();
+
+
+	global register_hit: function(hitvalue: string, desc: string);
+	global slack_hit: function(hitvalue: string, desc: string);
+
 }
 
 
@@ -230,6 +237,9 @@ function load_all_misp() {
 
 
 
+
+
+
 # SIGHTINGS FUNCTIONS
 function register_hit(hitvalue: string, desc: string) {
     local url_string = MISP_URL + "sightings/add/";
@@ -258,6 +268,8 @@ function register_hit(hitvalue: string, desc: string) {
 
 
 
+
+
 function slack_hit(hitvalue: string, desc: string) {
     local url_string = SLACK_URL;
     if (SLACK_URL == "")
@@ -283,63 +295,6 @@ function slack_hit(hitvalue: string, desc: string) {
 	
 }
 
-
-# Need to check info variables for null since they are all optional
-# Use a | separator since this is not as likely to be part of the data
-# Hit data should be kept below 1000 bytes or it will be rejected
-
-hook Notice::policy(n: Notice::Info) &priority=3 {
-	if (n$note == Intel::Notice) {
-		# Each notice contains an email section with the meta source included
-		# Check on this value to ensure only hits are registered
-		local isDT = F;
-		for (ebs in n$email_body_sections) {
-			if (strstr(n$email_body_sections[ebs],"MISP") > 1) {
-				isDT = T;
-				break;
-			}
-		}
-		
-		if (! isDT) {
-			return;
-		}
-	
-		local hit = "BRO";
-		if (n?$uid) {
-			hit += fmt("|uid:%s",n$uid);
-		}
-		if (n?$ts) {
-			hit += fmt("|ts:%f",n$ts);
-		}
-		
-		if (n?$id) {
-			hit += fmt("|orig_h:%s|orig_p:%s|resp_h:%s|resp_p:%s",n$id$orig_h,n$id$orig_p,n$id$resp_h,n$id$resp_p);
-		} else {
-			if (n?$src) {
-				hit += fmt("|src:%s",n$src);
-			}
-			if (n?$dst) {
-				hit += fmt("|dst:%s",n$dst);
-			}
-			if (n?$p) {
-				hit += fmt("|p:%s",n$p);
-			}
-		}
-		
-		if (n?$fuid) {
-			hit += fmt("|fuid:%s",n$fuid);
-		}
-		if (n?$msg) {
-			hit += "|msg:" + n$msg;
-		}
-		register_hit(n$sub, hit);
-		slack_hit(n$sub, hit);
-		print "Intel Signature Hit ===> " + n$sub;
-		print "   Metadata ===> " + hit;
-
-
-	}
-}
 
 
 
