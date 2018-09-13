@@ -387,7 +387,7 @@ event do_reload_signatures() {
 function load_signatures() {
 
 	print fmt("Downloading Signatures %s [%s]", strftime("%Y/%m/%d %H:%M:%S", network_time()), DH_VERSION);
-	slack_hit("", fmt("%s: Dovehawk: Bro Downloading Signatures %s [%s]", gethostname(), strftime("%Y/%m/%d %H:%M:%S", network_time()), DH_VERSION));
+	slack_hit("", fmt("%s: Dovehawk: Bro %s Downloading Signatures %s [%s]", gethostname(), bro_version(), strftime("%Y/%m/%d %H:%M:%S", network_time()), DH_VERSION));
 	
 	print fmt("Local Directory: %s", @DIR);
 	print fmt("MISP Server: %s", MISP_URL);
