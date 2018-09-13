@@ -26,7 +26,6 @@ export {
 
 hook extend_match(info: Info, s: Seen, items: set[Item])
 {
-print "dovehawk_expire.bro extend_match";
 	local matches = |items|;
 	for ( item in items )
 	{
