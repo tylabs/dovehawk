@@ -46,7 +46,7 @@ signature eicar_test_content {
   event "MISP: eicar test file in TCP plain text"
 }
 ```
-*Note: Bro's default setting is to buffer the (first 1024 bytes of a TCP connection)[https://www.bro.org/sphinx-git/frameworks/signatures.html] so signature's should be written with that in mind.*
+*Note: Bro's default setting is to buffer the [first 1024 bytes of a TCP connection](https://www.bro.org/sphinx-git/frameworks/signatures.html) so signature's should be written with that in mind.*
 
 ## Indicator Expiration
 
