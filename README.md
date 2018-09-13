@@ -46,6 +46,7 @@ signature eicar_test_content {
   event "MISP: eicar test file in TCP plain text"
 }
 ```
+*Note: Bro's default setting is to buffer the (first 1024 bytes of a TCP connection)[https://www.bro.org/sphinx-git/frameworks/signatures.html] so signature's should be written with that in mind.*
 
 ## Indicator Expiration
 
@@ -57,45 +58,51 @@ Intervals are set in dovehawk.bro.
 
 ### Setting for expired indicator cleanup (should be less then signature_refresh_period)
 
-'''redef Intel::item_expiration = 4 hr'''
+'''
+redef Intel::item_expiration = 4 hr
+'''
 
 
 ### Setting for MISP download interval
 
-'''global signature_refresh_period = 6hr &redef;'''
+'''
+global signature_refresh_period = 6hr &redef;
+'''
 
 
 ### Setting for indicator expiration: (should be slightly more than signature_refresh_period)
 
-'''$expire = 6.5 hr,'''
+'''
+$expire = 6.5 hr,
+'''
 
 
 ## Official Source
 
-https://dovehawk.io/
+<https://dovehawk.io/>
 
-https://github.com/tylabs/dovehawk/
+<https://github.com/tylabs/dovehawk/>
 
 
 ## Related Projects
 
-http://www.misp-project.org/ MISP
+<http://www.misp-project.org/> MISP
 
-https://www.bro.org/ Bro IDS
+<https://www.bro.org/> Bro IDS
 
 
 # Special Thanks
 
-CanCyber.org for their support in releasing a generic MISP version of their Bro Module as open source.
+(CanCyber.org)[https://cancyber.org] for their support in releasing a generic MISP version of their Bro Module as open source.
 
-Developers: Michael Kortekaas @mrkortek (original module), Tyler McLellan @tylabs (MISP combined import and sightings)
+Developers: Michael Kortekaas (@mrkortek)[https://twitter.com/mrkortek] (original module), Tyler McLellan (@tylabs)[https://twitter.com/tylabs] (MISP combined import and sightings)
 
-The entire MISP team and Alexandre Dulaunoy @adulau for adding the bro datatype to MISP.
+The entire MISP team and Alexandre Dulaunoy (@adulau)[https://twitter.com/adulau] for adding the bro datatype to MISP.
 
 
 # License
 
-Copyright 2018 Cancyber Inc., Michael Kortekaas @mrkortek, Tyler McLellan @tylabs
+Copyright 2018 (Cancyber Inc.)[https://cancyber.org/], Michael Kortekaas (@mrkortek)[https://twitter.com/mrkortek], Tyler McLellan (@tylabs)[https://twitter.com/tylabs]
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
