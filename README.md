@@ -35,6 +35,11 @@ Optional Slack.com web hook reporting.
 ![Slack Web Hook](https://dovehawk.io/images/slack_hit.png "Slack Output")
 
 
+### Intel Item Expiration
+
+![Items expiring](https://dovehawk.io/images/expire.png "Expiration")
+
+
 ## Sample Content Signature
 
 ```bro
