@@ -3,10 +3,7 @@
 Threat Hunting with Bro and MISP
 
 
-This module uses the the built-in Bro Intelligence Framework to load and monitor signatures from MISP automatically. Indicators are downloaded from MISP every 6 hours and hits, called sightings, are reported back to MISP immediately. The module also includes a customized version of Jan Grashoefer's expiration code to remove indicators after 7 hours after they are deleted from MISP.
-
-
-Indicators are downloaded automatically every 6 hours.  Indicators should expire after 7 hours if removed from MISP.
+This module uses the the built-in Bro Intelligence Framework to load and monitor signatures from MISP automatically. Indicators are downloaded from MISP every 6 hours and hits, called sightings, are reported back to MISP immediately. The module also includes a customized version of Jan Grashoefer's expiration code to remove indicators after they are deleted from MISP.
 
 
 Indicators are downloaded and read into memory.  Content signatures in signatures.sig are MISP Network Activity->bro items downloaded from MISP.  The event text should start with "MISP:".  Bro must be restarted to ingest the content signatures.  To do this automatically we recommend restarting bro using broctl and a restart cron described in included file INSTALL.md
@@ -49,6 +46,28 @@ signature eicar_test_content {
   event "MISP: eicar test file in TCP plain text"
 }
 ```
+
+## Indicator Expiration
+
+Indicators are downloaded automatically every 6 hours and are assigned an expiry of 6.5 hours.  A check for expired indicators occurs every 4 hours to cleanup any expired indicators between downloads.  As indicators are reingested the expiration time is reset to 6.5 hours.  A message is now printed for each expired indicator.
+
+If an indicator is hit after expiration but before the cleanup, it will trigger a hit/sighting, but the indicator is then deleted immediately so no further hits will occur.
+
+Intervals are set in dovehawk.bro.
+
+### Setting for expired indicator cleanup (should be less then signature_refresh_period)
+
+'''redef Intel::item_expiration = 4 hr'''
+
+
+### Setting for MISP download interval
+
+'''global signature_refresh_period = 6hr &redef;'''
+
+
+### Setting for indicator expiration: (should be slightly more than signature_refresh_period)
+
+'''$expire = 6.5 hr,'''
 
 
 ## Official Source

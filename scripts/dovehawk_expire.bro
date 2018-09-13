@@ -1,6 +1,8 @@
 ##! This script adds per item expiration for MISP intel items. This 
 # version does not reset the base time when hits are detected. It is based
 # on the intel-extensions package that is Copyright (c) 2016 by Jan Grashoefer
+# https://github.com/J-Gras/intel-extensions
+
 
 @load base/frameworks/intel
 
