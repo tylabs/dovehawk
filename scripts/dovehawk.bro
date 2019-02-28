@@ -243,7 +243,7 @@ function load_all_misp() {
 # SIGHTINGS FUNCTIONS
 function register_hit(hitvalue: string, desc: string) {
     local url_string = MISP_URL + "sightings/add/";
-    local post_data = fmt("{\"value\": \"%s\"}", hitvalue);
+    local post_data = fmt("{\"source\": \"dovehawk.io\", \"value\": \"%s\"}", hitvalue);
     #print post_data;
 
     local request: ActiveHTTP::Request = [
