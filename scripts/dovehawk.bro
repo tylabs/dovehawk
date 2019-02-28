@@ -12,7 +12,7 @@ module dovehawk;
 @load frameworks/intel/do_notice
 
 
-redef Intel::item_expiration = 4 hr;
+redef Intel::item_expiration = 7 hr;
 
 export {
 	global DH_VERSION = "1.00.002";
