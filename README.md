@@ -1,12 +1,12 @@
-# Dovehawk Bro Module
+# Dovehawk Zeek Module
 
 Threat Hunting with Zeek (Bro) and MISP
 
 
-This module uses the the built-in Intelligence Framework to load and monitor signatures from MISP automatically. Indicators are downloaded from MISP every 6 hours and hits, called sightings, are reported back to MISP immediately. The module also includes a customized version of Jan Grashoefer's expiration code to remove indicators after they are deleted from MISP.
+This module uses Zeek's built-in Intelligence Framework to load and monitor signatures from MISP automatically. Indicators are downloaded from MISP every 6 hours and hits, called sightings, are reported back to MISP immediately. The module also includes a customized version of Jan Grashoefer's expiration code to remove indicators after they are deleted from MISP.
 
 
-Indicators are downloaded and read into memory.  Content signatures in signatures.sig are MISP Network Activity->bro items downloaded from MISP.  The event text should start with "MISP:".  Zeek must be restarted to ingest the content signatures.  To do this automatically we recommend restarting Zeek using broctl and a restart cron described in included file INSTALL.md
+Indicators are downloaded and read into memory.  Content signatures in signatures.sig are MISP Network Activity->zeek items downloaded from MISP.  The event text should start with "MISP:" (see Sample Content Signature section for an example).  Zeek must be restarted to ingest the content signatures.  To do this automatically we recommend restarting Zeek using broctl and a restart cron described in included file [INSTALL.md](INSTALL.md)
 
 
 Optional Slack.com web hook reporting.
@@ -102,7 +102,7 @@ The entire MISP team and Alexandre Dulaunoy [@adulau](https://twitter.com/adulau
 
 # License
 
-Copyright &copy; 2018 [Cancyber Inc.](https://cancyber.org/), Michael Kortekaas [@mrkortek](https://twitter.com/mrkortek), Tyler McLellan [@tylabs](https://twitter.com/tylabs)
+Copyright &copy; 2018, 2019 [Cancyber Inc.](https://cancyber.org/), Michael Kortekaas [@mrkortek](https://twitter.com/mrkortek), Tyler McLellan [@tylabs](https://twitter.com/tylabs)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
