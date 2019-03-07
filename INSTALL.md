@@ -1,13 +1,13 @@
-# Dovehawk Bro Module
+# Dovehawk Zeek Module
 
-Threat Hunting with Bro and MISP
+Threat Hunting with Zeek (formerly Bro IDS) and MISP
 
 
 ## Requirements
 
 MISP: Version 2.4.94 includes the Bro datamodel required to handle content signatures.
 
-Bro IDS: tested with version version 2.5.4.
+Zeek NSM: tested with version version >2.5.4.
 
 Curl: command line tool for accessing web content, tested with curl 7.54.0.
 
@@ -18,7 +18,7 @@ Download latest release from GitHub
 
 Edit misp_config.bro and add your MISP API key, your MISP_URL and optional Slack Web Hook URL.
 
-Locally launch bro: bro -i en0 path_to_dovehawk
+Locally launch Zeek: bro -i en0 path_to_dovehawk
 
 
 ## Quick Start - Install package
@@ -80,12 +80,12 @@ If running using the broctl interface, edit the local.bro configuration file in 
 then run the broctl deploy sequence to have the scripts installed.
 
 
-## BRO Tips
+## Zeek Tips
 
 When running locally (ie running Bro on the same system you are generating traffic from), you may need to use the -C option to ignore checksum validation.
 
 
-## Optional Disable local logging
+## Optionally Disable local logging
 
 Add "Log::default_writer=Log::WRITER_NONE" to the command.
 
