@@ -219,7 +219,8 @@ function load_all_misp() {
 
 			print " Intel Indicator Counts:";
 			print fmt("    Intel::DOMAIN:    %d", domaincnt);
-			print fmt("    Intel::IP:        %d", ipcnt);
+			print fmt("    Intel::ADDR:        %d", ipcnt);
+			print fmt("    Intel::URL:        %d", urlcnt);
 			print fmt("    Intel::SUBNET:    %d", subnetcnt);
 			print fmt("    Intel::SOFTWARE:  %d", softwarecnt);
 			print fmt("    Intel::EMAIL:     %d", emailcnt);
