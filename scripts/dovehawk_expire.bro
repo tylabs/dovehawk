@@ -1,3 +1,6 @@
+##! Dovehawk Zeek Module - Intel Framework Extension V 1.00.003  2019 06 17 @tylabs
+# dovehawk.io
+#
 ##! This script adds per item expiration for MISP intel items. This 
 # version does not reset the base time when hits are detected. It is based
 # on the intel-extensions package that is Copyright (c) 2016 by Jan Grashoefer
@@ -72,6 +75,77 @@ hook extend_match(info: Info, s: Seen, items: set[Item])
 		}
 		hit += fmt(" [%s]",meta$desc);
 		hit += fmt(" (%s)",meta$url);
+
+
+		# extended service information 2019 06 17 add packet sizes, http url, smtp envelope and https sni
+
+		if (s?$node) {
+			hit += fmt("|node:%s",s$node);
+		}
+
+
+		local conn = s$conn;
+
+		if (conn?$service) {
+			hit += "|service:";
+			local service = conn$service;
+			for ( ser in service ) {
+				hit += fmt("%s,",ser);
+			}
+		}
+
+		if (conn?$orig) {
+			local orig = conn$orig;
+			if (orig?$size) {
+				hit += fmt("|orig:%s",orig$size);
+			}
+		}
+
+		if (conn?$resp) {
+			local resp = conn$resp;
+			if (resp?$size) {
+				hit += fmt("|resp:%s",resp$size);
+			}
+		}
+
+
+		if (conn?$http) {
+			local http = conn$http;
+			if (http?$host) {
+				hit += fmt("|host:%s",http$host);
+			}
+			if (http?$uri) {
+				hit += fmt("|uri:%s",http$uri);
+			}
+			if (http?$method) {
+				hit += fmt("|method:%s",http$method);
+			}
+		}
+
+		if (conn?$ssl) {
+			local ssl = conn$ssl;
+			if (ssl?$server_name) {
+				hit += fmt("|sni:%s",ssl$server_name);
+			}
+			if (ssl?$issuer) {
+				hit += fmt("|issuer:%s",ssl$issuer);
+			}
+		}
+
+		if (conn?$smtp) {
+			local smtp = conn$smtp;
+			if (smtp?$from) {
+				hit += fmt("|from:%s",smtp$from);
+			}
+			if (smtp?$subject) {
+				hit += fmt("|subject:%s",smtp$subject);
+			}
+			if (smtp?$rcptto) {
+				hit += fmt("|to:%s",smtp$rcptto);
+			}
+		}
+
+
 
 		dovehawk::register_hit(item$indicator, hit);
 		dovehawk::slack_hit(item$indicator, hit);

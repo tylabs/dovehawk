@@ -1,11 +1,11 @@
 # Dovehawk Zeek Module
 
-Threat Hunting with Zeek (formerly Bro IDS) and MISP
+Adversary Threat Hunting with Zeek (formerly Bro IDS) and MISP.
 
 
 ## Requirements
 
-MISP: Version 2.4.94 includes the Bro datamodel required to handle content signatures.
+MISP: Version 2.5 includes the Zeek datamodel required to handle content signatures.
 
 Zeek NSM: tested with version version >2.5.4.
 
@@ -21,7 +21,7 @@ Edit misp_config.bro and add your MISP API key, your MISP_URL and optional Slack
 Locally launch Zeek: bro -i en0 path_to_dovehawk
 
 
-## Quick Start - Install package
+## Quick Start - Install package using bro package manager.
 
 bro-pkg install https://github.com/tylabs/dovehawk
 
@@ -82,7 +82,7 @@ then run the broctl deploy sequence to have the scripts installed.
 
 ## Zeek Tips
 
-When running locally (ie running Bro on the same system you are generating traffic from), you may need to use the -C option to ignore checksum validation.
+When running locally (ie running Zeek on the same system you are generating traffic from), you may need to use the -C option to ignore checksum validation.
 
 
 ## Optionally Disable local logging
@@ -90,6 +90,11 @@ When running locally (ie running Bro on the same system you are generating traff
 Add "Log::default_writer=Log::WRITER_NONE" to the command.
 
 bro -i en0 dovehawk Log::default_writer=Log::WRITER_NONE
+
+
+## Zeek Health and Clusters
+
+Depending on the bandwidth - the NETSTATS info will show if dropped packets are occuring, you may with to add additional worker nodes to process traffic in a distributed fashion. Follow the CLUSTER.md instructions for details on local or remote clusters.
 
 
 ## Maintenance

@@ -1,4 +1,8 @@
-# Dovehawk Bro Module V 1.00.002  2018 08 28 @tylabs
+##! Dovehawk Zeek Module V 1.00.003  2019 06 17 @tylabs dovehawk.io
+# This module downloads Zeek Intelligence Framework items and Signature Framework Zeek items from MISP.
+# Sightings are reported back to MISP and optionally to a Slack webhook.
+# This script could be easily modified to send hits to a central database / web dashboard or to add in indicators from other sources.
+
 
 module dovehawk;
 
@@ -12,12 +16,14 @@ module dovehawk;
 @load frameworks/intel/do_notice
 
 
-redef Intel::item_expiration = 7 hr;
+redef Intel::item_expiration = 4.5 hr;
 
 export {
-	global DH_VERSION = "1.00.002";
+	global DH_VERSION = "1.00.003";
 	
-	global signature_refresh_period = 6hr &redef;
+	# Signature downloads occur every period defined below. A randomness of up to
+	# 1200 seconds is added to distribute the load of those updates on your MISP.
+	global signature_refresh_period = 4hr + double_to_interval(rand(1200)) &redef;
 	global load_signatures: function();
 
 
@@ -58,7 +64,7 @@ function request2curl(r: ActiveHTTP::Request, bodyfile: string, headersfile: str
 
 function strings_request(req: ActiveHTTP::Request): string_vec
 {
-	local tmpfile     = "/tmp/bro-activehttp-" + unique_id("");
+	local tmpfile     = "/tmp/zeek-activehttp-" + unique_id("");
 	local bodyfile    = fmt("%s_body", tmpfile);
 	local headersfile = fmt("%s_headers", tmpfile);
 
@@ -83,46 +89,59 @@ function strings_request(req: ActiveHTTP::Request): string_vec
 # SIGNATURE DOWNLOAD FUNCTIONS
 function load_sigs_misp() {
 	local request: ActiveHTTP::Request = [
-		$url = MISP_URL + "attributes/text/download/bro"
+		$url = MISP_URL + "attributes/text/download/zeek"
 	];
 	local fname = "signatures.sig";
 
-	print "Downloading Signatures...";
-	when ( local lines = strings_request(request) ) {
-		if (|lines| >= 0 ) {
-			print "Updating File " + fname;
-			# Directory variable appends period for some reason
-			# but guard that it may not exist in future.
-			local tmp_fname = @DIR + "/../signatures/." + fname;
-			local final_fname = @DIR + "/../signatures/" + fname;
-			local f = open(tmp_fname);
-			local cnt = 0;
-			enable_raw_output(f);
-			print f,"# Dovehawk.io Content Signatures - Sig events should have \"MISP:\" prefix\n\n";
+	local check = "find " + @DIR + "/../signatures/" + fname + " -mmin +60 | egrep .";
+	when ( local r = Exec::run([$cmd=check]) )
+	{
+        	if (r$exit_code != 0) {
+			print "INFO: file is recent not updating: " + fname;
+			return;
+        	}
 
-			for (line in lines) {
-				print f,gsub(lines[line], /\x0d/, "") + "\n"; #remove extra newlines bro doesn't like
-				if (sub_bytes(lines[line], 0, 10) == "signature ")
-					cnt += 1;
-			}
-			
-			close(f);
-			
-			if (unlink(final_fname)) {
-				if (rename(tmp_fname,final_fname)) {
-					print "    Finished Updating File: " + fname;
-				} else {
-					print "ERROR: Could not rename tmp file for signature update: " + tmp_fname;
+
+		print "Downloading Signatures...";
+		when ( local lines = strings_request(request) ) {
+			if (|lines| >= 0 ) {
+				print "Updating File " + fname;
+				# Directory variable appends period for some reason
+				# but guard that it may not exist in future.
+				local tmp_fname = @DIR + "/../signatures/." + fname;
+				local final_fname = @DIR + "/../signatures/" + fname;
+				local f = open(tmp_fname);
+				local cnt = 0;
+				enable_raw_output(f);
+				print f,"# Dovehawk.io Content Signatures - Sig events should have \"MISP:\" prefix\n\n";
+
+				for (line in lines) {
+					# don't write lines with double ## at start
+					if (|lines[line]| > 2 && lines[line][0] != "#" && lines[line][1] != "#") {
+						print f,gsub(lines[line], /\x0d/, "") + "\n"; #remove extra newlines Zeek doesn't like
+						if (sub_bytes(lines[line], 0, 10) == "signature ")
+							cnt += 1;
+					}
 				}
-			} else {
-				print "WARNING: Could not unlink file for signature update: " + final_fname;
-			}
-			print fmt("    Signatures file contains: %d signatures", |cnt|);
+			
+				close(f);
+			
+				if (unlink(final_fname)) {
+					if (rename(tmp_fname,final_fname)) {
+						print "    Finished Updating File: " + fname;
+					} else {
+						print "ERROR: Could not rename tmp file for signature update: " + tmp_fname;
+					}
+				} else {
+					print "WARNING: Could not unlink file for signature update: " + final_fname;
+				}
+				print fmt("    Signatures file contains: %d signatures", |cnt|);
 
-		} else {
-			print "WARNING: Signature update download failed";
+			} else {
+				print "WARNING: Signature update download failed";
+			}
 		}
-    }
+	}
 
 }
 
@@ -162,8 +181,8 @@ function load_all_misp() {
 				local parts = split_string(sig, /\t/);
 
 
-
-				if (|parts| > 3) {
+				# check for lines starting with # to ignore comments
+				if (|parts| > 3 && parts[0][0] != "#") {
 					local dh_meta : Intel::MetaData = [
 						$source = "MISP",
 						$do_notice = T,
@@ -301,7 +320,7 @@ function slack_hit(hitvalue: string, desc: string) {
 
 
 function startup_intel() {
-	# WARNING: network_time function seems to return 0 until after Bro is fully initialized
+	# WARNING: network_time function seems to return 0 until after Zeek is fully initialized
 	local startup_meta : Intel::MetaData = [
 		$source = "MISP",
 		$do_notice = T,
@@ -330,20 +349,41 @@ function startup_intel() {
 
 
 event do_reload_signatures() {
+@if( /^2\./ in bro_version() )
 	if (bro_is_terminating()) {
-		print "Bro Terminating - Cancelling Scheduled Signature Downloads";
+
+		print "Zeek Terminating - Cancelling Scheduled Signature Downloads";
 	} else {
+
+		load_signatures();
+		
+		schedule signature_refresh_period { do_reload_signatures() };
+
+	}
+@else
+	if (zeek_is_terminating()) {
+		print "Zeek Terminating - Cancelling Scheduled Signature Downloads";
+	} else {
+
 		load_signatures();
 		
 		schedule signature_refresh_period { do_reload_signatures() };
 	}
+
+@endif
+
 }
 
 
 function load_signatures() {
 
 	print fmt("Downloading Signatures %s [%s]", strftime("%Y/%m/%d %H:%M:%S", network_time()), DH_VERSION);
-	slack_hit("", fmt("%s: Dovehawk: Bro %s Downloading Signatures %s [%s]", gethostname(), bro_version(), strftime("%Y/%m/%d %H:%M:%S", network_time()), DH_VERSION));
+
+	# print health - dropped packets may mean - the -C option is needed or a cluster to handle the bandwidth
+	local ns = get_net_stats();
+	print fmt("NETSTATS: pkts_dropped=%d  pkts_recvd=%d  pkts_link=%d  bytes_recvd=%d", ns$pkts_dropped, ns$pkts_recvd, ns$pkts_link, ns$bytes_recvd);
+
+	slack_hit("", fmt("%s: Dovehawk: Zeek %s Downloading Signatures %s [%s]. pkts_dropped=%d  pkts_recvd=%d  pkts_link=%d  bytes_recvd=%d", gethostname(), bro_version(), strftime("%Y/%m/%d %H:%M:%S", network_time()), DH_VERSION, ns$pkts_dropped, ns$pkts_recvd, ns$pkts_link, ns$bytes_recvd));
 	
 	print fmt("Local Directory: %s", @DIR);
 	print fmt("MISP Server: %s", MISP_URL);
@@ -353,10 +393,10 @@ function load_signatures() {
 		exit(1);
 	}
 		
-	# Load all contains all MISP bro output combined
+	# Load all contains all MISP Zeek output combined
 	load_all_misp();
 
-	# Download bro content signatures MISP->Network Activity->bro items
+	# Download Zeek content signatures MISP->Network Activity->Zeek items
 	load_sigs_misp();
 	
 	# Force output into stdout.log when using broctl
@@ -394,7 +434,7 @@ event signature_match(state: signature_state, msg: string, data: string)
 		dst_port = state$conn$id$orig_p;
 	}
 	
-	local hit = "BRO";
+	local hit = "ZEEK";
 	if (state$conn?$uid) {
 		hit += fmt("|uid:%s",state$conn$uid);
 	}
@@ -423,12 +463,21 @@ event signature_match(state: signature_state, msg: string, data: string)
 
 }
 
-
+# version 3 will deprecate some of the bro_ functions
+@if( /^2\./ in bro_version() )
 event bro_init()
 {
 	startup_intel();
 	schedule signature_refresh_period { do_reload_signatures() };
 }
+@else
+event zeek_init()
+{
+	startup_intel();
+	schedule signature_refresh_period { do_reload_signatures() };
+}
+@endif
+
 
 
 event file_new(f: fa_file)

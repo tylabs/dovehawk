@@ -1,5 +1,5 @@
 [package]
 script_dir = .
-description = MISP+Bro. Dovehawk is a Bro Module to import MISP indicators to the Intel Framework automatically and report sightings directly back to MISP as they happen.
+description = MISP+Zeek. Dovehawk is a Zeek Module to import MISP indicators to the Intel Framework and Signature Framework automatically. Reports sightings directly back to MISP as they happen.
 tags = intel, MISP, sightings, signatures
-version = 1.00.002
+version = 1.00.003
