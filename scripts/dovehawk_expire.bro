@@ -1,4 +1,4 @@
-##! Dovehawk Zeek Module - Intel Framework Extension V 1.00.003  2019 06 17 @tylabs
+##! Dovehawk Zeek Module - Intel Framework Extension V 1.00.004  2019 07 03 @tylabs
 # dovehawk.io
 #
 ##! This script adds per item expiration for MISP intel items. This 
@@ -20,6 +20,9 @@ export {
 
 		## Internal value tracks time of item creation, last update.
 		last_update: time  &default = network_time();
+
+		hits:        int      &default = 0;
+
 	};
 
 }
@@ -50,6 +53,17 @@ hook extend_match(info: Info, s: Seen, items: set[Item])
 			remove(item, T);
 			next;
 		}
+
+
+		item$meta$hits += 1;
+		insert(item);
+		#print fmt("hits for item %d", item$meta$hits);
+
+		if (item$meta$hits > dovehawk::MAX_HITS) {
+			print fmt("Suppressing Excessive hits for Intel Item That Hit: %s %d times", item$indicator, item$meta$hits);
+			next;
+		}
+
 
 
 		#trigger intel notice here instead of policy to have access to the metadata

@@ -1,4 +1,4 @@
-##! Dovehawk Zeek Module V 1.00.003  2019 06 17 @tylabs dovehawk.io
+##! Dovehawk Zeek Module V 1.00.004  2019 07 03 @tylabs dovehawk.io
 # This module downloads Zeek Intelligence Framework items and Signature Framework Zeek items from MISP.
 # Sightings are reported back to MISP and optionally to a Slack webhook.
 # This script could be easily modified to send hits to a central database / web dashboard or to add in indicators from other sources.
@@ -19,7 +19,11 @@ module dovehawk;
 redef Intel::item_expiration = 4.5 hr;
 
 export {
-	global DH_VERSION = "1.00.003";
+	global DH_VERSION = "1.00.004";
+
+	# Maximum number of hits per indicator item before suppressing remote alerts
+	global MAX_HITS: int = 100;
+
 	
 	# Signature downloads occur every period defined below. A randomness of up to
 	# 1200 seconds is added to distribute the load of those updates on your MISP.
@@ -183,12 +187,14 @@ function load_all_misp() {
 
 				# check for lines starting with # to ignore comments
 				if (|parts| > 3 && parts[0][0] != "#") {
+					local zero: int = 0;
 					local dh_meta : Intel::MetaData = [
 						$source = "MISP",
 						$do_notice = T,
 						$expire = 6.5 hr,
 						$desc = parts[3],
-						$url = parts[4]
+						$url = parts[4],
+						$hits = zero
 					];
 					local item : Intel::Item = [
 						$indicator = parts[0],
@@ -321,12 +327,14 @@ function slack_hit(hitvalue: string, desc: string) {
 
 function startup_intel() {
 	# WARNING: network_time function seems to return 0 until after Zeek is fully initialized
+	local zero: int = 0;
 	local startup_meta : Intel::MetaData = [
 		$source = "MISP",
 		$do_notice = T,
 		$expire = -1 min,
 		$last_update = network_time(),
 		$url = "",
+		$hits = zero,
 		$desc = "local dummy item"
 
 	];
