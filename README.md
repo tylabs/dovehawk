@@ -11,6 +11,9 @@ Indicators are downloaded and read into memory.  Content signatures in signature
 
 Optional Slack.com web hook reporting.
 
+![Sticker 1](https://dovehawk.io/images/dovehawk_sticker1.png "Sticker 1") ![Sticker 2](https://dovehawk.io/images/dovehawk_sticker2.png "Sticker 2")
+
+
 
 ## Screencaps
 
@@ -77,6 +80,14 @@ $expire = 6.5 hr,
 ```
 
 
+### Maximum number of hits for an individual item per refresh period
+
+```bro
+global MAX_HITS: int = 100;
+```
+
+
+
 ## Official Source
 
 <https://dovehawk.io/>
@@ -97,7 +108,7 @@ $expire = 6.5 hr,
 
 Developers: Michael Kortekaas [@mrkortek](https://twitter.com/mrkortek) (original module), Tyler McLellan [@tylabs](https://twitter.com/tylabs) (MISP combined import and sightings)
 
-The entire MISP team and Alexandre Dulaunoy [@adulau](https://twitter.com/adulau) for adding the bro datatype to MISP.
+The entire MISP team and Alexandre Dulaunoy [@adulau](https://twitter.com/adulau) for adding the zeek datatype to MISP.
 
 
 # License
