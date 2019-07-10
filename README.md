@@ -3,7 +3,7 @@
 Threat Hunting with Zeek (Bro) and MISP
 
 
-This module uses Zeek's built-in Intelligence Framework to load and monitor signatures from MISP automatically. Indicators are downloaded from MISP every 6 hours and hits, called sightings, are reported back to MISP immediately. The module also includes a customized version of Jan Grashoefer's expiration code to remove indicators after they are deleted from MISP.
+This module uses Zeek's built-in Intelligence Framework to load and monitor signatures from MISP automatically. Indicators are downloaded from MISP every 4 hours and hits, called sightings, are reported back to MISP immediately. The module also includes a customized version of Jan Grashoefer's expiration code to remove indicators after they are deleted from MISP.
 
 
 Indicators are downloaded and read into memory.  Content signatures in signatures.sig are MISP Network Activity->zeek items downloaded from MISP.  The event text should start with "MISP:" (see Sample Content Signature section for an example).  Zeek must be restarted to ingest the content signatures.  To do this automatically we recommend restarting Zeek using broctl and a restart cron described in included file [INSTALL.md](INSTALL.md)
@@ -57,26 +57,26 @@ Indicators are downloaded automatically every 6 hours and are assigned an expiry
 
 If an indicator is hit after expiration but before the cleanup, it will trigger a hit/sighting, but the indicator is then deleted immediately so no further hits will occur.
 
-Intervals are set in dovehawk.bro.
+Intervals are set in config.bro.
 
 ### Setting for expired indicator cleanup (should be less then signature_refresh_period)
 
 ```bro
-redef Intel::item_expiration = 4 hr
+redef Intel::item_expiration = 4.5 hr
 ```
 
 
 ### Setting for MISP download interval
 
 ```bro
-global signature_refresh_period = 6hr &redef;
+global signature_refresh_period = 4hr &redef;
 ```
 
 
 ### Setting for indicator expiration: (should be slightly more than signature_refresh_period)
 
 ```bro
-$expire = 6.5 hr,
+redef Intel::item_expiration = 4.5 hr;
 ```
 
 
@@ -86,6 +86,23 @@ $expire = 6.5 hr,
 global MAX_HITS: int = 100;
 ```
 
+### Maximum number of DNS hits for an individual item per refresh period
+
+```bro
+global MAX_DNS_HITS: int = 2;
+```
+
+### Maximum number of inbound IP hits for an individual item per refresh period
+
+```bro
+global MAX_SCAN_HITS: int = 2;
+```
+
+### Ignore hits in SSL certificate when domains don't match the sni host
+
+```bro
+global IGNORE_SNI_MISMATCH: bool = T;
+```
 
 
 ## Official Source

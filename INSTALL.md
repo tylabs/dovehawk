@@ -7,7 +7,7 @@ Adversary Threat Hunting with Zeek (formerly Bro IDS) and MISP.
 
 MISP: Version 2.5 includes the Zeek datamodel required to handle content signatures.
 
-Zeek NSM: tested with version version >2.5.4.
+Zeek NSM: tested with version version >2.5.3.
 
 Curl: command line tool for accessing web content, tested with curl 7.54.0.
 
@@ -16,7 +16,7 @@ Curl: command line tool for accessing web content, tested with curl 7.54.0.
 
 Download latest release from GitHub
 
-Edit misp_config.bro and add your MISP API key, your MISP_URL and optional Slack Web Hook URL.
+Edit config.bro and add your MISP API key, your MISP_URL and optional Slack Web Hook URL.
 
 Locally launch Zeek: bro -i en0 path_to_dovehawk
 
@@ -27,7 +27,7 @@ bro-pkg install https://github.com/tylabs/dovehawk
 
 Run package to get local directory: bro -i en0 dovehawk
 
-Edit misp_config.bro and add your MISP API key, your MISP_URL and optional Slack Web Hook URL.
+Edit config.bro and add your MISP API key, your MISP_URL and optional Slack Web Hook URL.
 
 Run: bro -i en0 dovehawk
 

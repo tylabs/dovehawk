@@ -1,4 +1,4 @@
-##! Dovehawk Zeek Module V 1.00.004  2019 07 03 @tylabs dovehawk.io
+##! Dovehawk Zeek Module V 1.01.001  2019 07 08 @tylabs dovehawk.io
 # This module downloads Zeek Intelligence Framework items and Signature Framework Zeek items from MISP.
 # Sightings are reported back to MISP and optionally to a Slack webhook.
 # This script could be easily modified to send hits to a central database / web dashboard or to add in indicators from other sources.
@@ -6,7 +6,7 @@
 
 module dovehawk;
 
-@load ../misp_config.bro
+@load ../config.bro
 @load ./dovehawk_expire.bro
 
 @load-sigs ../signatures/signatures.sig
@@ -16,21 +16,11 @@ module dovehawk;
 @load frameworks/intel/do_notice
 
 
-redef Intel::item_expiration = 4.5 hr;
-
 export {
-	global DH_VERSION = "1.00.004";
+	global DH_VERSION = "1.01.001";
 
-	# Maximum number of hits per indicator item before suppressing remote alerts
-	global MAX_HITS: int = 100;
-
-	
-	# Signature downloads occur every period defined below. A randomness of up to
-	# 1200 seconds is added to distribute the load of those updates on your MISP.
-	global signature_refresh_period = 4hr + double_to_interval(rand(1200)) &redef;
+	#removed randomness added to internal + double_to_interval(rand(1200))
 	global load_signatures: function();
-
-
 	global register_hit: function(hitvalue: string, desc: string);
 	global slack_hit: function(hitvalue: string, desc: string);
 
@@ -191,7 +181,7 @@ function load_all_misp() {
 					local dh_meta : Intel::MetaData = [
 						$source = "MISP",
 						$do_notice = T,
-						$expire = 6.5 hr,
+						$expire = Intel::item_expiration,
 						$desc = parts[3],
 						$url = parts[4],
 						$hits = zero
@@ -475,17 +465,28 @@ event signature_match(state: signature_state, msg: string, data: string)
 @if( /^2\./ in bro_version() )
 event bro_init()
 {
-	startup_intel();
-	schedule signature_refresh_period { do_reload_signatures() };
+	#run signature downloads on the manager only. indicators are automatically shared to workers
+	if ( (Cluster::is_enabled() && Cluster::local_node_type() == Cluster::MANAGER) ) {
+		startup_intel();
+		event do_reload_signatures();
+	} else if ( !Cluster::is_enabled() ) {
+		startup_intel();
+		schedule signature_refresh_period {do_reload_signatures()};
+	}
 }
 @else
 event zeek_init()
 {
-	startup_intel();
-	schedule signature_refresh_period { do_reload_signatures() };
+	#run signature downloads on the manager only. indicators are automatically shared to workers
+	if ( (Cluster::is_enabled() && Cluster::local_node_type() == Cluster::MANAGER) || !Cluster::is_enabled() ) {
+		startup_intel();
+		event do_reload_signatures();
+	} else if ( !Cluster::is_enabled() ) {
+		startup_intel();
+		schedule signature_refresh_period {do_reload_signatures()};
+	}
 }
 @endif
-
 
 
 event file_new(f: fa_file)

@@ -1,4 +1,4 @@
-##! Dovehawk Zeek Module - Intel Framework Extension V 1.00.004  2019 07 03 @tylabs
+##! Dovehawk Zeek Module - Intel Framework Extension V 1.01.001  2019 07 08 @tylabs
 # dovehawk.io
 #
 ##! This script adds per item expiration for MISP intel items. This 
@@ -7,6 +7,9 @@
 # https://github.com/J-Gras/intel-extensions
 
 @load base/frameworks/intel
+@load base/utils/directions-and-hosts
+@load frameworks/intel/seen
+
 
 module Intel;
 
@@ -22,6 +25,9 @@ export {
 		last_update: time  &default = network_time();
 
 		hits:        int      &default = 0;
+		dns_hits:        int      &default = 0;
+		scan_hits:        int      &default = 0;
+
 
 	};
 
@@ -36,6 +42,9 @@ hook extend_match(info: Info, s: Seen, items: set[Item])
 	for ( item in items )
 	{
 		local meta = item$meta;
+		local conn = s$conn;
+		local di = NO_DIRECTION;
+
 		#print fmt("extend match: %s",item$indicator);
 		#print meta;
 
@@ -54,22 +63,46 @@ hook extend_match(info: Info, s: Seen, items: set[Item])
 			next;
 		}
 
+		if (Site::is_local_addr(conn$id$orig_h) || Site::is_private_addr(conn$id$orig_h) ) {
+			di = OUTBOUND;
+		} else if (Site::is_local_addr(conn$id$resp_h) || Site::is_private_addr(conn$id$resp_h) ) {
+			di = INBOUND;
+		}
+
+		local services = |conn$service|;
+
+		if (s$indicator_type == Intel::ADDR && di == INBOUND && services == 0) {
+			item$meta$scan_hits += 1;
+		}
+
+		if (s$indicator_type == Intel::DOMAIN && s$where == DNS::IN_REQUEST) {
+			item$meta$dns_hits += 1;
+		}
 
 		item$meta$hits += 1;
 		insert(item);
 		#print fmt("hits for item %d", item$meta$hits);
 
-		if (item$meta$hits > dovehawk::MAX_HITS) {
+		# caps on low confidence network activity - dns requests and scans
+
+		if (dovehawk::MAX_HITS > 0 && item$meta$hits > dovehawk::MAX_HITS) {
 			print fmt("Suppressing Excessive hits for Intel Item That Hit: %s %d times", item$indicator, item$meta$hits);
+			next;
+		}
+			
+		if (dovehawk::MAX_DNS_HITS > 0 && item$meta$dns_hits > dovehawk::MAX_DNS_HITS) {
+			print fmt("Suppressing Excessive hits for Intel Item That Hit In DNS Request: %s %d times", item$indicator, item$meta$dns_hits);
+			next;
+		}
+		if (dovehawk::MAX_SCAN_HITS > 0 && item$meta$scan_hits > dovehawk::MAX_SCAN_HITS) {
+			print fmt("Suppressing Excessive hits for Intel Item That Hit Inbound Scan: %s %d times", item$indicator, item$meta$scan_hits);
 			next;
 		}
 
 
-
 		#trigger intel notice here instead of policy to have access to the metadata
 
-	
-		local hit = "BRO";
+		local hit = "ZEEK";
 		if (info?$uid) {
 			hit += fmt("|uid:%s",info$uid);
 		}
@@ -96,9 +129,6 @@ hook extend_match(info: Info, s: Seen, items: set[Item])
 		if (s?$node) {
 			hit += fmt("|node:%s",s$node);
 		}
-
-
-		local conn = s$conn;
 
 		if (conn?$service) {
 			hit += "|service:";
@@ -140,6 +170,10 @@ hook extend_match(info: Info, s: Seen, items: set[Item])
 			local ssl = conn$ssl;
 			if (ssl?$server_name) {
 				hit += fmt("|sni:%s",ssl$server_name);
+				#check for domain mismatch for CloudFlare situations where multiple domains are on the same certificate
+				if (dovehawk::IGNORE_SNI_MISMATCH && s$where == X509::IN_CERT && (string_cat("www", ssl$server_name) != item$indicator && ssl$server_name != item$indicator && ssl$server_name != string_cat("www", item$indicator) ) ) {
+					next;
+				}
 			}
 			if (ssl?$issuer) {
 				hit += fmt("|issuer:%s",ssl$issuer);
@@ -159,6 +193,12 @@ hook extend_match(info: Info, s: Seen, items: set[Item])
 			}
 		}
 
+		if (conn?$dns) {
+			local dns = conn$dns;
+			if (dns?$qtype_name) {
+				hit += fmt("|q:%s",dns$qtype_name);
+			}
+		}
 
 
 		dovehawk::register_hit(item$indicator, hit);

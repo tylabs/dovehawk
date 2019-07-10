@@ -2,16 +2,17 @@
 
 The Dovehawk Zeek module can be run in a cluster with a central manager and many remote worker's each monitoring their own local interface.  You can also use a cluster locally to distribute bandwidth automatically to distribute load for monitoring traffic even up to the 10-20Gbs range on sufficient hardware.
 
-You can also use Dovehawk on cloud servers using a cluster where taps and span ports are not available in the same way. 
+We recommend reviewing the [Zeek Cluster](https://docs.zeek.org/en/stable/cluster/) which recommends 1 core per 250Mbs of peak traffic and methods to distribute traffic to multiple  worker hardware. 
+
+You can also use Dovehawk on cloud servers using a cluster where taps and span ports are not available, cluster workers can monitor a local network port.
+
+DoveHawk from version 1.01.01 supports the transparent cluster to have a single manager download indicators and distribute them to all workers automatically rather than each worker downloading the signatures.
 
 # Requirements
 
 Root ssh access is required for remote workers.
 
 Zeek requires the same OS type, dependent libraries and Zeek version across the manager and workers.
-
-Clusters should use the helper update.py script to pull down the signatures so the most up to date version is pushed out the all the workers.
-
 
 
 ## Remote Workers: Setup ssh keys for root logins
@@ -55,6 +56,10 @@ Note: to use a single standalone server and still use broctl, leave this file un
 Edit /usr/local/bro/etc/node.cfg::
 [manager]
 type=manager
+host=10.100.1.69
+
+[logger]
+type=logger
 host=10.100.1.69
  
 [proxy-1]
@@ -111,10 +116,5 @@ Restart / read latest signatures:
 To keep everything running and also force the reimport of content signatures:
 
 */5 * * * * /usr/local/bro/bin/broctl cron
-1 22 * * * /usr/bin/python /usr/local/bro/share/bro/site/dovehawk/update.py && /usr/local/bro/bin/broctl deploy  > /dev/null 2>&1
-
-## Notes:
-
-Each worker will individually download the signatures and report hits. Your MISP instance should be sized to handle enough concurrent signature downloads.
-
+1 22 * * * /usr/local/bro/bin/broctl deploy  > /dev/null 2>&1
 
