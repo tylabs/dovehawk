@@ -53,7 +53,7 @@ signature eicar_test_content {
 
 ## Indicator Expiration
 
-Indicators are downloaded automatically every 6 hours and are assigned an expiry of 6.5 hours.  A check for expired indicators occurs every 4 hours to cleanup any expired indicators between downloads.  As indicators are reingested the expiration time is reset to 6.5 hours.  A message is now printed for each expired indicator.
+Indicators are downloaded automatically every 4 hours and are assigned an expiry of 4.5 hours.  A check for expired indicators occurs every 4.5 hours to cleanup any expired indicators between downloads.  As indicators are reingested the expiration time is reset to 4.5 hours.  A message is now printed for each expired indicator.
 
 If an indicator is hit after expiration but before the cleanup, it will trigger a hit/sighting, but the indicator is then deleted immediately so no further hits will occur.
 
