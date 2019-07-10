@@ -445,10 +445,10 @@ event signature_match(state: signature_state, msg: string, data: string)
 	hit += "|sigid:" + sig_id + "|msg:" + msg;
 	
 	# This should always be true but check just in case
-	if (|hit| < 800) {
+	if (|hit| < 1800) {
 		# Trim the matched data down to fit the sql hit structure limit
-		if ( (|data| + |hit|) > 900 )
-			data = fmt("%s...", sub_bytes(data, 0, 900-|hit|));
+		if ( (|data| + |hit|) > 2000 )
+			data = fmt("%s...", sub_bytes(data, 0, 2000-|hit|));
 
 		hit += "|data:" + data;
 	}
