@@ -466,7 +466,7 @@ event signature_match(state: signature_state, msg: string, data: string)
 event bro_init()
 {
 	#run signature downloads on the manager only. indicators are automatically shared to workers
-	if ( (Cluster::is_enabled() && Cluster::local_node_type() == Cluster::MANAGER) ) {
+	if ( Cluster::is_enabled() && Cluster::local_node_type() == Cluster::MANAGER ) {
 		startup_intel();
 		event do_reload_signatures();
 	} else if ( !Cluster::is_enabled() ) {
@@ -478,7 +478,7 @@ event bro_init()
 event zeek_init()
 {
 	#run signature downloads on the manager only. indicators are automatically shared to workers
-	if ( (Cluster::is_enabled() && Cluster::local_node_type() == Cluster::MANAGER) || !Cluster::is_enabled() ) {
+	if ( Cluster::is_enabled() && Cluster::local_node_type() == Cluster::MANAGER ) {
 		startup_intel();
 		event do_reload_signatures();
 	} else if ( !Cluster::is_enabled() ) {
