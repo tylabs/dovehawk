@@ -143,6 +143,16 @@ hook extend_match(info: Info, s: Seen, items: set[Item])
 			if (orig?$size) {
 				hit += fmt("|orig:%s",orig$size);
 			}
+			if (orig?$num_pkts) {
+				hit += fmt("|o_pkts:%s",orig$num_pkts);
+			}
+			if (orig?$num_bytes_ip) {
+				hit += fmt("|o_bytes:%s",orig$num_bytes_ip);
+			}
+			if (orig?$state) {
+				hit += fmt("|o_state:%s",orig$state);
+			}
+
 		}
 
 		if (conn?$resp) {
@@ -150,6 +160,24 @@ hook extend_match(info: Info, s: Seen, items: set[Item])
 			if (resp?$size) {
 				hit += fmt("|resp:%s",resp$size);
 			}
+			if (resp?$num_pkts) {
+				hit += fmt("|r_pkts:%s",resp$num_pkts);
+			}
+			if (resp?$num_bytes_ip) {
+				hit += fmt("|r_bytes:%s",resp$num_bytes_ip);
+			}
+			if (resp?$state) {
+				hit += fmt("|r_state:%s",resp$state);
+			}
+
+		}
+
+		if (conn?$start_time) {
+			hit += fmt("|start_time:%s",conn$start_time);
+		}
+
+		if (conn?$duration) {
+			hit += fmt("|duration:%s",conn$duration);
 		}
 
 
@@ -198,6 +226,10 @@ hook extend_match(info: Info, s: Seen, items: set[Item])
 			if (dns?$qtype_name) {
 				hit += fmt("|q:%s",dns$qtype_name);
 			}
+			if (dns?$answers) {
+				hit += fmt("|answers:%s",dns$answers);
+			}
+
 		}
 
 
