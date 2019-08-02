@@ -1,4 +1,4 @@
-##! Dovehawk Zeek Module V 1.01.001  2019 07 08 @tylabs dovehawk.io
+##! Dovehawk Zeek Module V 1.01.002  2019 08 02 @tylabs dovehawk.io
 # This module downloads Zeek Intelligence Framework items and Signature Framework Zeek items from MISP.
 # Sightings are reported back to MISP and optionally to a Slack webhook.
 # This script could be easily modified to send hits to a central database / web dashboard or to add in indicators from other sources.
@@ -14,10 +14,11 @@ module dovehawk;
 @load frameworks/intel/seen
 @load base/frameworks/intel
 @load frameworks/intel/do_notice
+@load base/utils/directions-and-hosts
 
 
 export {
-	global DH_VERSION = "1.01.001";
+	global DH_VERSION = "1.01.002";
 
 	#removed randomness added to internal + double_to_interval(rand(1200))
 	global load_signatures: function();
@@ -111,7 +112,7 @@ function load_sigs_misp() {
 
 				for (line in lines) {
 					# don't write lines with double ## at start
-					if (|lines[line]| > 2 && lines[line][0] != "#" && lines[line][1] != "#") {
+					if (|lines[line]| >= 1 && lines[line][0] != "#" && lines[line][1] != "#") {
 						print f,gsub(lines[line], /\x0d/, "") + "\n"; #remove extra newlines Zeek doesn't like
 						if (sub_bytes(lines[line], 0, 10) == "signature ")
 							cnt += 1;
@@ -416,6 +417,8 @@ event signature_match(state: signature_state, msg: string, data: string)
 	local src_port: port;
 	local dst_addr: addr;
 	local dst_port: port;
+	local di = NO_DIRECTION;
+
 
 	if ( state$is_orig )
 	{
@@ -441,7 +444,122 @@ event signature_match(state: signature_state, msg: string, data: string)
 	}
 	
 	hit += fmt("|orig_h:%s|orig_p:%s|resp_h:%s|resp_p:%s",src_addr,src_port,dst_addr,dst_port);
-	
+
+
+	local conn = state$conn;
+
+	if (Site::is_local_addr(conn$id$orig_h) || Site::is_private_addr(conn$id$orig_h) ) {
+		di = OUTBOUND;
+	} else if (Site::is_local_addr(conn$id$resp_h) || Site::is_private_addr(conn$id$resp_h) ) {
+		di = INBOUND;
+	}
+
+
+	if (di == OUTBOUND) {
+		hit += "|d:OUTBOUND";
+	} else if (di == INBOUND) {
+		hit += "|d:INBOUND";
+	}
+
+	if (conn?$service) {
+		hit += "|service:";
+		local service = conn$service;
+		local servicename: string = "";
+		for ( ser in service ) {
+			servicename += fmt("%s,",ser);
+		}
+		if (|servicename| > 0) {
+			hit += cut_tail(servicename, 1);
+		}
+	}
+
+	if (conn?$orig) {
+		local orig = conn$orig;
+		if (orig?$size) {
+			hit += fmt("|orig:%s",orig$size);
+		}
+		if (orig?$num_pkts) {
+			hit += fmt("|o_pkts:%s",orig$num_pkts);
+		}
+		if (orig?$num_bytes_ip) {
+			hit += fmt("|o_bytes:%s",orig$num_bytes_ip);
+		}
+		if (orig?$state) {
+			hit += fmt("|o_state:%s",orig$state);
+		}
+	}
+
+	if (conn?$resp) {
+		local resp = conn$resp;
+		if (resp?$size) {
+			hit += fmt("|resp:%s",resp$size);
+		}
+		if (resp?$num_pkts) {
+			hit += fmt("|r_pkts:%s",resp$num_pkts);
+		}
+		if (resp?$num_bytes_ip) {
+			hit += fmt("|r_bytes:%s",resp$num_bytes_ip);
+		}
+		if (resp?$state) {
+			hit += fmt("|r_state:%s",resp$state);
+		}
+	}
+
+	if (conn?$start_time) {
+		hit += fmt("|start_time:%s",conn$start_time);
+	}
+
+	if (conn?$duration) {
+		hit += fmt("|duration:%s",conn$duration);
+	}
+
+	if (conn?$http) {
+		local http = conn$http;
+		if (http?$host) {
+			hit += fmt("|host:%s",http$host);
+		}
+		if (http?$uri) {
+			hit += fmt("|uri:%s",http$uri);
+		}
+		if (http?$method) {
+			hit += fmt("|method:%s",http$method);
+		}
+	}
+
+	if (conn?$ssl) {
+		local ssl = conn$ssl;
+		if (ssl?$server_name) {
+			hit += fmt("|sni:%s",ssl$server_name);
+			if (ssl?$issuer) {
+				hit += fmt("|issuer:%s",ssl$issuer);
+			}
+		}
+
+		if (conn?$smtp) {
+			local smtp = conn$smtp;
+			if (smtp?$from) {
+				hit += fmt("|from:%s",smtp$from);
+			}
+			if (smtp?$subject) {
+				hit += fmt("|subject:%s",smtp$subject);
+			}
+			if (smtp?$rcptto) {
+				hit += fmt("|to:%s",smtp$rcptto);
+			}
+		}
+
+		if (conn?$dns) {
+			local dns = conn$dns;
+			if (dns?$qtype_name) {
+				hit += fmt("|q:%s",dns$qtype_name);
+			}
+			if (dns?$answers) {
+				hit += fmt("|answers:%s",dns$answers);
+			}
+		}
+	}
+
+
 	hit += "|sigid:" + sig_id + "|msg:" + msg;
 	
 	# This should always be true but check just in case
