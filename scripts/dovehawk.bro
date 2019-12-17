@@ -1,4 +1,4 @@
-##! Dovehawk Zeek Module V 1.01.002  2019 08 02 @tylabs dovehawk.io
+##! Dovehawk Zeek Module V 1.01.003  2019 12 17 @tylabs dovehawk.io
 # This module downloads Zeek Intelligence Framework items and Signature Framework Zeek items from MISP.
 # Sightings are reported back to MISP and optionally to a Slack webhook.
 # This script could be easily modified to send hits to a central database / web dashboard or to add in indicators from other sources.
@@ -18,7 +18,7 @@ module dovehawk;
 
 
 export {
-	global DH_VERSION = "1.01.002";
+	global DH_VERSION = "1.01.003";
 
 	#removed randomness added to internal + double_to_interval(rand(1200))
 	global load_signatures: function();
@@ -534,28 +534,29 @@ event signature_match(state: signature_state, msg: string, data: string)
 				hit += fmt("|issuer:%s",ssl$issuer);
 			}
 		}
+	}
 
-		if (conn?$smtp) {
-			local smtp = conn$smtp;
-			if (smtp?$from) {
-				hit += fmt("|from:%s",smtp$from);
-			}
-			if (smtp?$subject) {
-				hit += fmt("|subject:%s",smtp$subject);
-			}
-			if (smtp?$rcptto) {
-				hit += fmt("|to:%s",smtp$rcptto);
-			}
+
+	if (conn?$smtp) {
+		local smtp = conn$smtp;
+		if (smtp?$from) {
+			hit += fmt("|from:%s",smtp$from);
 		}
+		if (smtp?$subject) {
+			hit += fmt("|subject:%s",smtp$subject);
+		}
+		if (smtp?$rcptto) {
+			hit += fmt("|to:%s",smtp$rcptto);
+		}
+	}
 
-		if (conn?$dns) {
-			local dns = conn$dns;
-			if (dns?$qtype_name) {
-				hit += fmt("|q:%s",dns$qtype_name);
-			}
-			if (dns?$answers) {
-				hit += fmt("|answers:%s",dns$answers);
-			}
+	if (conn?$dns) {
+		local dns = conn$dns;
+		if (dns?$qtype_name) {
+			hit += fmt("|q:%s",dns$qtype_name);
+		}
+		if (dns?$answers) {
+			hit += fmt("|answers:%s",dns$answers);
 		}
 	}
 
