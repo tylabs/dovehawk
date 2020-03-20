@@ -7,7 +7,7 @@ Adversary Threat Hunting with Zeek (formerly Bro IDS) and MISP.
 
 MISP: Version 2.5 includes the Zeek datamodel required to handle content signatures.
 
-Zeek NSM: tested with version version >2.5.3.
+Zeek NSM: tested with version version >= 3.1.1.
 
 Curl: command line tool for accessing web content, tested with curl 7.54.0.
 
@@ -16,68 +16,68 @@ Curl: command line tool for accessing web content, tested with curl 7.54.0.
 
 Download latest release from GitHub
 
-Edit config.bro and add your MISP API key, your MISP_URL and optional Slack Web Hook URL.
+Edit config.zeek and add your MISP API key, your MISP_URL and optional Slack Web Hook URL.
 
-Locally launch Zeek: bro -i en0 path_to_dovehawk
+Locally launch Zeek: zeek -i en0 path_to_dovehawk
 
 
-## Quick Start - Install package using bro package manager.
+## Quick Start - Install package using zeek package manager.
 
-bro-pkg install https://github.com/tylabs/dovehawk
+zpkg install https://github.com/tylabs/dovehawk
 
-Run package to get local directory: bro -i en0 dovehawk
+Run package to get local directory: zeek -i en0 dovehawk
 
-Edit config.bro and add your MISP API key, your MISP_URL and optional Slack Web Hook URL.
+Edit config.zeek and add your MISP API key, your MISP_URL and optional Slack Web Hook URL.
 
-Run: bro -i en0 dovehawk
+Run: zeek -i en0 dovehawk
 
 
 
 ## Detailed Install
 
-Install bro: brew install bro / yum install bro
+Install zeek: brew install zeek / yum install zeek
 
-Install bro-pkg: sudo pip install bro-pkg
+Install zkg (Zeek package manager): sudo pip install zkg
 
-Setup bro-pkg: bro-pkg autoconfig
+Setup zkg: zkg autoconfig
 
-bro-pkg install https://github.com/tylabs/dovehawk
+zkg install https://github.com/tylabs/dovehawk
 
-check the install: bro -i en0 dovehawk
+check the install: zeek -i en0 dovehawk
 
-edit misp_config.bro to include your MISP API key, MISP URL and optional Slack Web Hook.
+edit config.zeek to include your MISP API key, MISP URL and optional Slack Web Hook.
 
-edit broctl local config: /usr/local/share/bro/site/local.bro:
+edit zeekctl local config: /usr/local/share/zeek/site/local.zeek:
 
-add: @load [FULL PATH]/dovehawk #ie  /usr/local/Cellar/bro/2.5.4/share/bro/site/dovehawk/
+add: @load [FULL PATH]/dovehawk #ie  /usr/local/Cellar/zeek/3.1.1/share/zeek/site/dovehawk/
 
 check eth interface setting: /usr/local/etc/node.cfg
 
-run: broctl deploy
+run: zeekctl deploy
 
-cronjob add: */5 * * * * /usr/local/bin/broctl cron
+cronjob add: */5 * * * * /usr/local/bin/zeekctl cron
 
-restart bro: /usr/local/bin/broctl restart
+restart zeek: /usr/local/bin/zeekctl restart
 
-cronjob to restart bro to reimport signatures: 1 */4 * * * /usr/local/bin/broctl restart
+cronjob to restart zeek to reimport signatures: 1 */4 * * * /usr/local/bin/zeekctl restart
 
 
 ## Monitoring and context
 
-The bro module outputs hits to the console, logs to file, and could send metadata to another web hook.
+The zeek module outputs hits to the console, logs to file, and could send metadata to another web hook.
 
 
 ## Usage
 
-If running bro directly, reference the dovehawk folder:
+If running zeek directly, reference the dovehawk folder:
 
-sudo bro -i en1 [FULL PATH]/dovehawk
+sudo zeek -i en1 [FULL PATH]/dovehawk
 
-If running using the broctl interface, edit the local.bro configuration file in /usr/local/bro/share/bro/site and, at the bottom, add the line:
+If running using the zeekctl interface, edit the local.zeek configuration file in /usr/local/zeek/share/zeek/site and, at the bottom, add the line:
 
 @load [FULL PATH]/dovehawk
 
-then run the broctl deploy sequence to have the scripts installed.
+then run the zeekctl deploy sequence to have the scripts installed.
 
 
 ## Zeek Tips
@@ -89,7 +89,7 @@ When running locally (ie running Zeek on the same system you are generating traf
 
 Add "Log::default_writer=Log::WRITER_NONE" to the command.
 
-bro -i en0 dovehawk Log::default_writer=Log::WRITER_NONE
+zeek -i en0 dovehawk Log::default_writer=Log::WRITER_NONE
 
 
 ## Zeek Health and Clusters
@@ -99,7 +99,7 @@ Depending on the bandwidth - the NETSTATS info will show if dropped packets are 
 
 ## Maintenance
 
-For long term monitoring, if not disabling logs as above, use broctl to launch, rotate logs, and restart after crashes.
+For long term monitoring, if not disabling logs as above, use zeekctl to launch, rotate logs, and restart after crashes.
 
 
 

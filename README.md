@@ -6,7 +6,7 @@ Threat Hunting with Zeek (Bro) and MISP
 This module uses Zeek's built-in Intelligence Framework to load and monitor signatures from MISP automatically. Indicators are downloaded from MISP every 4 hours and hits, called sightings, are reported back to MISP immediately. The module also includes a customized version of Jan Grashoefer's expiration code to remove indicators after they are deleted from MISP.
 
 
-Indicators are downloaded and read into memory.  Content signatures in signatures.sig are MISP Network Activity->zeek items downloaded from MISP.  The event text should start with "MISP:" (see Sample Content Signature section for an example).  Zeek must be restarted to ingest the content signatures.  To do this automatically we recommend restarting Zeek using broctl and a restart cron described in included file [INSTALL.md](INSTALL.md)
+Indicators are downloaded and read into memory.  Content signatures in signatures.sig are MISP Network Activity->zeek items downloaded from MISP.  The event text should start with "MISP:" (see Sample Content Signature section for an example).  Zeek must be restarted to ingest the content signatures.  To do this automatically we recommend restarting Zeek using zeekctl and a restart cron described in included file [INSTALL.md](INSTALL.md)
 
 
 Optional Slack.com web hook reporting.
@@ -42,14 +42,14 @@ Optional Slack.com web hook reporting.
 
 ## Sample Content Signature
 
-```bro
+```zeek
 signature eicar_test_content {
   ip-proto == tcp
   payload /.*X5O\!P%@AP\[4\\PZX54\(P\^\)7CC\)7\}\$EICAR\-STANDARD\-ANTIVIRUS\-TEST\-FILE\!\$H\+H\*/
   event "MISP: eicar test file in TCP plain text"
 }
 ```
-*Note: Zeek's default setting is to buffer the [first 1024 bytes of a TCP connection](https://www.bro.org/sphinx-git/frameworks/signatures.html) so signature's should be written with that in mind.*
+*Note: Zeek's default setting is to buffer the [first 1024 bytes of a TCP connection](https://www.zeek.org/sphinx-git/frameworks/signatures.html) so signature's should be written with that in mind.*
 
 ## Indicator Expiration
 
@@ -57,50 +57,50 @@ Indicators are downloaded automatically every 4 hours and are assigned an expiry
 
 If an indicator is hit after expiration but before the cleanup, it will trigger a hit/sighting, but the indicator is then deleted immediately so no further hits will occur.
 
-Intervals are set in config.bro.
+Intervals are set in config.zeek.
 
 ### Setting for expired indicator cleanup (should be less then signature_refresh_period)
 
-```bro
+```zeek
 redef Intel::item_expiration = 4.5 hr
 ```
 
 
 ### Setting for MISP download interval
 
-```bro
+```zeek
 global signature_refresh_period = 4hr &redef;
 ```
 
 
 ### Setting for indicator expiration: (should be slightly more than signature_refresh_period)
 
-```bro
+```zeek
 redef Intel::item_expiration = 4.5 hr;
 ```
 
 
 ### Maximum number of hits for an individual item per refresh period
 
-```bro
+```zeek
 global MAX_HITS: int = 100;
 ```
 
 ### Maximum number of DNS hits for an individual item per refresh period
 
-```bro
+```zeek
 global MAX_DNS_HITS: int = 2;
 ```
 
 ### Maximum number of inbound IP hits for an individual item per refresh period
 
-```bro
+```zeek
 global MAX_SCAN_HITS: int = 2;
 ```
 
 ### Ignore hits in SSL certificate when domains don't match the sni host
 
-```bro
+```zeek
 global IGNORE_SNI_MISMATCH: bool = T;
 ```
 

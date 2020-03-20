@@ -19,7 +19,7 @@ Zeek requires the same OS type, dependent libraries and Zeek version across the 
 
 ### On manager:
 
-bro-manager# ssh-keygen 
+zeek-manager# ssh-keygen 
  Generating public/private rsa key pair. 
  Enter file in which to save the key (/root/.ssh/id_rsa): [ Press Enter ] 
  Enter passphrase (empty for no passphrase): [ Press Enter ] 
@@ -51,9 +51,9 @@ See INSTALL.md
 
 ## Setup your cluster:
 
-Note: to use a single standalone server and still use broctl, leave this file unchanged.
+Note: to use a single standalone server and still use zeekctl, leave this file unchanged.
 
-Edit /usr/local/bro/etc/node.cfg::
+Edit /usr/local/zeek/etc/node.cfg::
 [manager]
 type=manager
 host=10.100.1.69
@@ -92,29 +92,29 @@ interface=eth0
 
 ## All:  Deploy and Run Dovehawk on workers:
 
-/usr/local/bro/bin/broctl deploy
+/usr/local/zeek/bin/zeekctl deploy
 
 Check status:
 
-/usr/local/bro/bin/broctl status
+/usr/local/zeek/bin/zeekctl status
 
 Stop:
 
-/usr/local/bro/bin/broctl stop
+/usr/local/zeek/bin/zeekctl stop
 
 Restart / read latest signatures:
 
-/usr/local/bro/bin/broctl restart
+/usr/local/zeek/bin/zeekctl restart
 
 
 ## All: Logs viewing:
 
-/usr/local/bro/logs or /usr/local/bro/spool
+/usr/local/zeek/logs or /usr/local/zeek/spool
 
 ## All: Cron
 
 To keep everything running and also force the reimport of content signatures:
 
-*/5 * * * * /usr/local/bro/bin/broctl cron
-1 22 * * * /usr/local/bro/bin/broctl deploy  > /dev/null 2>&1
+*/5 * * * * /usr/local/zeek/bin/zeekctl cron
+1 22 * * * /usr/local/zeek/bin/zeekctl deploy  > /dev/null 2>&1
 

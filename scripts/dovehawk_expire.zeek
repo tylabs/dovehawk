@@ -1,4 +1,4 @@
-##! Dovehawk Zeek Module - Intel Framework Extension V 1.01.002  2019 08 02 @tylabs
+##! Dovehawk Zeek Module - Intel Framework Extension V 1.02.001  2020 03 20 @tylabs
 # dovehawk.io
 #
 ##! This script adds per item expiration for MISP intel items. This 
@@ -33,7 +33,7 @@ export {
 
 }
 
-@load ./dovehawk.bro
+@load ./dovehawk
 
 
 hook extend_match(info: Info, s: Seen, items: set[Item])

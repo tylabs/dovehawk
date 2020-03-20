@@ -17,6 +17,7 @@ signature cancyber-gh0st {
   payload /^Gh0st/
   tcp-state originator
   event "MISP: Gh0stRat header in tcp"
+}
 
 # Plugx Variants
 signature cancyber-plugx_http {
