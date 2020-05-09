@@ -5,7 +5,7 @@ Adversary Threat Hunting with Zeek (formerly Bro IDS) and MISP.
 
 ## Requirements
 
-MISP: Version 2.5 includes the Zeek datamodel required to handle content signatures.
+MISP: Version 2.4 includes the Zeek datamodel required to handle content signatures.
 
 Zeek NSM: tested with version version >= 3.1.1.
 
