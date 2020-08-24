@@ -121,16 +121,12 @@ global IGNORE_SNI_MISMATCH: bool = T;
 
 # Special Thanks
 
-[CanCyber.org](https://cancyber.org) for their support in releasing a generic MISP version of their Zeek Module as open source.
-
-Developers: Michael Kortekaas [@mrkortek](https://twitter.com/mrkortek) (original module), Tyler McLellan [@tylabs](https://twitter.com/tylabs) (MISP combined import and sightings)
-
 The entire MISP team and Alexandre Dulaunoy [@adulau](https://twitter.com/adulau) for adding the zeek datatype to MISP.
 
 
 # License
 
-Copyright &copy; 2018, 2019 [Cancyber Inc.](https://cancyber.org/), Michael Kortekaas [@mrkortek](https://twitter.com/mrkortek), Tyler McLellan [@tylabs](https://twitter.com/tylabs)
+Copyright &copy; 2018, 2019, 2020.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
