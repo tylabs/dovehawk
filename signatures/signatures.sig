@@ -1,10 +1,5 @@
 # Dovehawk Content Signatures - Sig events should have "MISP:" prefix
 
-signature cancyber_test_content {
-  ip-proto == tcp
-  payload /.*991CANCYBER_TEST_BAD_SIGNATURE991/
-  event "MISP: test content in TCP"
-}
 
 signature eicar_test_content {
   ip-proto == tcp
@@ -12,7 +7,7 @@ signature eicar_test_content {
   event "MISP: eicar test file in TCP"
 }
 
-signature cancyber-gh0st {
+signature gh0st {
   ip-proto == tcp
   payload /^Gh0st/
   tcp-state originator
@@ -20,7 +15,7 @@ signature cancyber-gh0st {
 }
 
 # Plugx Variants
-signature cancyber-plugx_http {
+signature plugx_http {
   ip-proto == tcp
   tcp-state established,originator
   payload /POST /
@@ -29,7 +24,7 @@ signature cancyber-plugx_http {
 }
 
 # China chopper https://www.fireeye.com/blog/threat-research/2013/08/breaking-down-the-china-chopper-web-shell-part-ii.html
-signature cancyber-chopper_http_post {
+signature chopper_http_post {
   ip-proto == tcp
   tcp-state established,originator
   payload /POST /
