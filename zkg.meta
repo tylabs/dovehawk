@@ -2,4 +2,4 @@
 script_dir = .
 description = MISP+Zeek. Dovehawk is a Zeek Module to import MISP indicators to the Intel Framework and Signature Framework automatically. Reports sightings directly back to MISP as they happen. Supports Zeek Clusters.
 tags = intel, MISP, sightings, signatures, threat intelligence, threat intel, cyber
-version = 1.02.001
+version = 1.02.002

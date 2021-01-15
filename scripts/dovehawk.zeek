@@ -1,4 +1,4 @@
-##! Dovehawk Zeek Module V 1.02.001  2020 03 20 @tylabs dovehawk.io
+##! Dovehawk Zeek Module V 1.02.002  2021 01 14 @tylabs dovehawk.io
 # This module downloads Zeek Intelligence Framework items and Signature Framework Zeek items from MISP.
 # Sightings are reported back to MISP and optionally to a Slack webhook.
 # This script could be easily modified to send hits to a central database / web dashboard or to add in indicators from other sources.
@@ -19,7 +19,7 @@ module dovehawk;
 
 
 export {
-	global DH_VERSION = "1.02.001";
+	global DH_VERSION = "1.02.002";
 
 	#removed randomness added to internal + double_to_interval(rand(1200))
 	global load_signatures: function();
@@ -50,6 +50,9 @@ function request2curl(r: ActiveHTTP::Request, bodyfile: string, headersfile: str
 
 	if ( r?$addl_curl_args )
 		cmd = fmt("%s %s", cmd, r$addl_curl_args);
+
+	if ( dovehawk::CURL_INSECURE )
+		cmd = fmt("%s %s", cmd, "-k");
 
 	cmd = fmt("%s \"%s\"", cmd, safe_shell_quote(r$url));
 	# Make sure file will exist even if curl did not write one.
@@ -151,7 +154,7 @@ function load_sigs_misp() {
 # Special option to load all the hash strings combined as a single file
 function load_all_misp() {
 	local request: ActiveHTTP::Request = [
-		$url = MISP_URL + "attributes/bro/download/all" #this will probably change to zeek eventually
+		$url = MISP_URL + dovehawk::MISP_ATTRIBUTE_URL #this will probably change to zeek eventually
 	];
 
     print "Downloading Indicators...";
@@ -263,14 +266,17 @@ function load_all_misp() {
 # SIGHTINGS FUNCTIONS
 function register_hit(hitvalue: string, desc: string) {
     local url_string = MISP_URL + "sightings/add/";
-    local post_data = fmt("{\"source\": \"dovehawk.io\", \"value\": \"%s\"}", hitvalue);
+    local post_data = fmt("{\"source\": \"%s\", \"value\": \"%s\"}", dovehawk::CLUSTER_ID, hitvalue);
+    local insecure = "";
+    if ( dovehawk::CURL_INSECURE )
+	insecure = "-k";
     #print post_data;
 
     local request: ActiveHTTP::Request = [
 	$url=url_string,
 	$method="POST",
 	$client_data=post_data,
-	$addl_curl_args = fmt("--header \"Authorization: %s\" --header \"Content-Type: application/json\" --header \"Accept: application/json\"", safe_shell_quote(dovehawk::APIKEY))
+	$addl_curl_args = fmt("--header \"Authorization: %s\" --header \"Content-Type: application/json\" --header \"Accept: application/json\" %s", safe_shell_quote(dovehawk::APIKEY), insecure)
     ];
 	
     when ( local resp = ActiveHTTP::request(request) ) {
@@ -295,13 +301,16 @@ function slack_hit(hitvalue: string, desc: string) {
     if (SLACK_URL == "")
     	return;
     local post_data = fmt("{\"text\": \"%s\", \"attachments\": \"%s\"}", escape_string(desc), escape_string(desc));
+    local insecure = "";
+    if ( dovehawk::CURL_INSECURE )
+	insecure = "-k";
     #print post_data;
 
     local request: ActiveHTTP::Request = [
 	$url=url_string,
 	$method="POST",
 	$client_data=post_data,
-	$addl_curl_args = " --header \"Content-Type: application/json\" --header \"Accept: application/json\""
+	$addl_curl_args = fmt(" --header \"Content-Type: application/json\" --header \"Accept: application/json\" %s", insecure)
     ];
 	
     when ( local resp = ActiveHTTP::request(request) ) {

@@ -61,6 +61,12 @@ restart zeek: /usr/local/bin/zeekctl restart
 
 cronjob to restart zeek to reimport signatures: 1 */4 * * * /usr/local/bin/zeekctl restart
 
+## MISP SSL With Self Signed Certs
+
+Set CURL_INSECURE to T in the config.zeek:
+
+global CURL_INSECURE: bool = T: 
+
 
 ## Monitoring and context
 

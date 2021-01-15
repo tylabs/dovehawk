@@ -8,6 +8,8 @@ export {
 	global MISP_URL = "https://yourmispsite.com/"; #script will append attributes/text/download/zeek
 	global SLACK_URL = ""; #optional web hook for Slack
 	global SIG_PREFIX = "MISP:"; #prefix for our signatures to hook alerts
+	global MISP_ATTRIBUTE_URL = "attributes/bro/download/all"; #misp url for zeek export
+	global CURL_INSECURE: bool = T; #set to T to ignore curl certificate errors
 
 
 	# Maximum number of hits per indicator item before suppressing remote alerts
@@ -22,9 +24,8 @@ export {
 
 	#skip signature download if recent
 	global SKIP_SIGNATURE_DOWNLOAD: bool = T;
+	global CLUSTER_ID = "dovehawk.io"; #source name for MISP sightings
 
-
-	global signature_refresh_period = 4hr  &redef;
 
 
 }
