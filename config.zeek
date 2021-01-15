@@ -9,7 +9,7 @@ export {
 	global SLACK_URL = ""; #optional web hook for Slack
 	global SIG_PREFIX = "MISP:"; #prefix for our signatures to hook alerts
 	global MISP_ATTRIBUTE_URL = "attributes/bro/download/all"; #misp url for zeek export
-	global CURL_INSECURE: bool = T; #set to T to ignore curl certificate errors
+	global CURL_INSECURE: bool = F; #set to T to ignore curl certificate errors
 
 
 	# Maximum number of hits per indicator item before suppressing remote alerts
