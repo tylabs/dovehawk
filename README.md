@@ -113,16 +113,21 @@ global CURL_INSECURE: bool = T;
 
 ## Official Source
 
-<https://dovehawk.io/>
-
 <https://github.com/tylabs/dovehawk/>
 
 
 ## Related Projects
 
-<http://www.misp-project.org/> MISP
+[MISP](http://www.misp-project.org/)
 
-<https://www.zeek.org/> Zeek Network Security Monitor
+[Zeek Network Security Monitor](https://www.zeek.org/)
+
+[Zeek Package Manager](https://packages.zeek.org) - Zeek Packages to add on functionality.
+
+[Zeek Cluster and Recommended Hardware](https://docs.zeek.org/en/stable/cluster/)
+
+[MISP Sightings](https://www.circl.lu/doc/misp/sightings/) - Sightings are feedback on threat intelligence activity seen.
+
 
 
 # Special Thanks
@@ -132,7 +137,7 @@ The entire MISP team and Alexandre Dulaunoy [@adulau](https://twitter.com/adulau
 
 # License
 
-Copyright &copy; 2018, 2019, 2020, 2021. @tylabs
+Copyright &copy; 2018, 2019, 2020, 2021. [@tylabs](https://twitter.com/tylabs)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
