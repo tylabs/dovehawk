@@ -11,7 +11,7 @@ Indicators are downloaded and read into memory.  Content signatures in signature
 
 Optional Slack.com web hook reporting.
 
-![Sticker 1](https://dovehawk.io/images/dovehawk_sticker1.png "Sticker 1") ![Sticker 2](https://dovehawk.io/images/dovehawk_sticker2.png "Sticker 2")
+![Sticker 1](docs/images/dovehawk_sticker1.png "Sticker 1") ![Sticker 2](docs/images/dovehawk_sticker2.png "Sticker 2")
 
 
 
@@ -19,25 +19,25 @@ Optional Slack.com web hook reporting.
 
 ### Dovehawk Downloads Indicators From MISP
 
-![Dovehawk signature download](https://dovehawk.io/images/dovehawk_launch.png "Dovehawk startup")
+![Dovehawk signature download](docs/images/dovehawk_launch.png "Dovehawk startup")
 
 ### Dovehawk Sighting Uploaded
 
-![Dovehawk hit and sighting upload](https://dovehawk.io/images/dovehawk_hit.png "Dovehawk hit")
+![Dovehawk hit and sighting upload](docs/images/dovehawk_hit.png "Dovehawk hit")
 
 ### MISP Sighting
 
-![MISP sightings](https://dovehawk.io/images/misp_sightings.png "MISP Sightings")
+![MISP sightings](docs/images/misp_sightings.png "MISP Sightings")
 
 
 ### Slack Web Hook
 
-![Slack Web Hook](https://dovehawk.io/images/slack_hit.png "Slack Output")
+![Slack Web Hook](docs/images/slack_hit.png "Slack Output")
 
 
 ### Intel Item Expiration
 
-![Items expiring](https://dovehawk.io/images/expire.png "Expiration")
+![Items expiring](docs/images/expire.png "Expiration")
 
 
 ## Sample Content Signature
