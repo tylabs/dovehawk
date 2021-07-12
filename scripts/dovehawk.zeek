@@ -1,4 +1,4 @@
-##! Dovehawk Zeek Module V 1.02.002  2021 01 14 @tylabs dovehawk.io
+##! Dovehawk Zeek Module V 1.02.002  2021 01 14 @tylabs dovehawk
 # This module downloads Zeek Intelligence Framework items and Signature Framework Zeek items from MISP.
 # Sightings are reported back to MISP and optionally to a Slack webhook.
 # This script could be easily modified to send hits to a central database / web dashboard or to add in indicators from other sources.
@@ -115,7 +115,7 @@ function load_sigs_misp() {
 			local f = open(tmp_fname);
 			local cnt = 0;
 			enable_raw_output(f);
-			print f,"# Dovehawk.io Content Signatures - Sig events should have SIG_PREFIX prefix\n\n";
+			print f,"# Dovehawk Content Signatures - Sig events should have SIG_PREFIX prefix\n\n";
 
 			for (line in lines) {
 				# don't write lines with double ## at start

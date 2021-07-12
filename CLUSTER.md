@@ -1,4 +1,4 @@
-# Zeek Cluster Setup for Dovehawk.io
+# Zeek Cluster Setup for Dovehawk
 
 The Dovehawk Zeek module can be run in a cluster with a central manager and many remote worker's each monitoring their own local interface.  You can also use a cluster locally to distribute bandwidth automatically to distribute load for monitoring traffic even up to the 10-20Gbs range on sufficient hardware.
 

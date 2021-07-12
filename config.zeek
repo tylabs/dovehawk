@@ -24,7 +24,7 @@ export {
 
 	#skip signature download if recent
 	global SKIP_SIGNATURE_DOWNLOAD: bool = T;
-	global CLUSTER_ID = "dovehawk.io"; #source name for MISP sightings
+	global CLUSTER_ID = "dovehawk"; #source name for MISP sightings
 
 
 
